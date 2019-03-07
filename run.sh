@@ -42,4 +42,11 @@ else
 		echo "Extracting $export_file"
 		unzip "$export_file" -d "$export_folder"
 	fi
+	
+	echo "Computing statistics..."
+	for f in $(ls src |grep stat*); do
+		echo $f
+		python3 src/$f
+	done
+	echo "Computing done."
 fi
