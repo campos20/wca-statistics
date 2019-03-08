@@ -1,7 +1,7 @@
 from utils import *
-from build_page import build_page
+from build_page import build_results
 from os import listdir
-import json
+import json, sys
 
 # TODO find a better way to do this
 # perhaps making every file a class and use class.get_link and class.get_title
@@ -14,13 +14,13 @@ def main():
 	
 	out = {}
 
-	out["title"] = "Statistics"
 	out["subtitle"] = "Export date: %s"%get_export_date()
+	out["labels"] = ["Statistics"]
 	
 	table = []
 	for f in listdir("pages/"):
 		temp = f.split(".")
-		if temp[0] != "main" and temp[-1] == "html":
+		if temp[0] != "main_page" and temp[-1] == "html":
 			with open("pages/%s"%f, "r", encoding="utf8") as page:
 			
 				# here we get the content inside each <script>'s page
@@ -36,9 +36,7 @@ def main():
 	table = sorted(table)
 	out["table"] = table
 	
-	page = build_page(out)
-	
-	with open("pages/main.html", "w", encoding="utf8") as fout:
-		fout.write(page)
+	args = sys.argv
+	build_results(out, args)
 	
 main()

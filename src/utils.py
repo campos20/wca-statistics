@@ -31,3 +31,9 @@ def reduce_to_letters(s):
 def avg(l):
 	if len(l) == 0: return 0.
 	return 1.0*sum(l)/len(l)
+
+def parse_link(link):
+	"""Get link's text only"""
+	if "<a href" in link:
+		return link[link.index(">")+1: link.index("</a>")]
+	return link

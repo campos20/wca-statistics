@@ -1,5 +1,5 @@
-import csv
-from build_page import build_page
+import csv, sys
+from build_page import build_results
 
 def common_id():
 
@@ -43,9 +43,8 @@ def common_id():
 	return out
 
 def main():
-	page = build_page(common_id())
-	
-	with open("pages/most_common_4_letters.html", "w", encoding="utf8") as fout:
-		fout.write(page)
+	stat = common_id()
+	args = sys.argv
+	build_results(stat, args)
 	
 main()

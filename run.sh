@@ -53,9 +53,10 @@ else
 	echo "Computing statistics..."
 	for f in $(ls src |grep stat*); do
 		echo $f
-		python3 src/$f
+		python3 src/$f page=true
 	done
 	echo "Computing done."
 	
-	python3 src/build_main_page.py
+	python3 src/main_page.py page=true
+	echo "Open pages/main.html for a complete view."
 fi

@@ -1,6 +1,6 @@
 import csv, sys
-from build_page import build_page
-from utils import html_link_format
+from build_page import build_results
+from utils import *
 from datetime import date
 
 def get_comp_with_n_days(days):
@@ -61,10 +61,15 @@ def main():
 		n = int(args[1])
 	except:
 		n = 3 # we assume n=1
-		
-	page = build_page(get_comp_with_n_days(n))	
 	
-	with open("pages/3_days_competitions_with_few_events.html", "w", encoding="utf8") as fout:
-		fout.write(page)
+	build = False
+	for x in args:
+		if "=" in x:
+			var, value = x.split("=")
+			if var == "page" and value == "true":
+				build = True
+	
+	stat = get_comp_with_n_days(n)
+	build_results(stat, args)
 
 main()

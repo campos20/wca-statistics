@@ -1,6 +1,6 @@
-import csv
+import csv, sys
 from utils import *
-from build_page import build_page
+from build_page import build_results
 
 def avg_letter():
 	country_list = []
@@ -62,9 +62,8 @@ def avg_letter():
 	
 def main():
 
-	page = build_page(avg_letter())
-	
-	with open("pages/avg_letter_count_by_country.html", "w", encoding="utf8") as fout:
-		fout.write(page)
+	args = sys.argv
+	stat = avg_letter()
+	build_results(stat, args)
 			
 main()

@@ -1,6 +1,6 @@
-import csv
+import csv, sys
 from utils import *
-from build_page import build_page
+from build_page import build_results
 
 def avg_name_count():
 	country_list = []
@@ -56,9 +56,8 @@ def avg_name_count():
 
 def main():
 
-	page = build_page(avg_name_count())	
+	stat = avg_name_count()
+	args = sys.argv
+	build_results(stat, args)
 	
-	with open("pages/avg_name_count.html", "w", encoding="utf8") as fout:
-		fout.write(page)
-
 main()

@@ -1,6 +1,6 @@
 import sys, utils
 import pandas as pd
-from build_page import build_page
+from build_page import build_results
 
 def missing_event(n):
 
@@ -50,9 +50,8 @@ def main():
 	except:
 		n = 1 # we assume n=1
 		
-	page = build_page(missing_event(n))
-	
-	with open("pages/most_common_missing_event.html", "w", encoding="utf8") as fout:
-		fout.write(page)
+	stat = missing_event(n)
+	args = sys.argv
+	build_results(stat, args)
 
 main()
