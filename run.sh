@@ -10,27 +10,18 @@ if [ -f $export_file ]; then
 	date_of_export=$(date -r "$export_file" +%s)
 	
 	if (( date_of_export <= one_week )); then # Here we check how old the export is.
-		read -p "$export_file is older than 7 days. Do you want me to remove to download again?" yn
-		
-		case $yn in
-		    [Yy]* ) rm $export_file; download=true;; # If the export is too old, we remove it so we can download it again.
-		    [Nn]* ) echo "OK, let's keep the old version then.";;
-		    * ) echo "Please answer y/n. Terminating."; exit;;
-		esac
+		echo "$export_file is older than 7 days."
+		rm $export_file;
+		download=true;
 	else
 		echo "$export_file is up to date."
 	fi
 else
-	read -p "$export_file not found. Do you want me to download it? (y/n) " yn
-
-	case $yn in
-        [Yy]* ) download=true;;
-        [Nn]* ) echo "OK, terminating"; exit;;
-        * ) echo "Please answer y/n. Terminating."; exit;;
-    esac
+	download=true;
 fi
 
 if [ "$download" = true ] ; then
+	echo "Downloading the latest export."
 	wget https://www.worldcubeassociation.org/results/misc/WCA_export.tsv.zip
 fi
 

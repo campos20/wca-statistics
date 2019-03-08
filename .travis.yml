@@ -1,0 +1,21 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+cache: bundler
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: pages
+  on:
+    branch: gh-pages
+install:
+  - pip install numpy
+  - pip3 install pandas
+script:
+  - run.sh

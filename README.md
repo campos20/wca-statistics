@@ -1,4 +1,4 @@
-# wca-statistics
+# wca-statistics [![Build Status](https://travis-ci.org/campos20/wca-statistics.svg?branch=master)](https://travis-ci.org/campos20/wca-statistics)
 
 This repository is meant to provide statistics for the WCA Statistics [group on Facebook](https://www.facebook.com/groups/439995439706174). It's also my repo to study data science with Python.
 
