@@ -24,11 +24,16 @@ def missing_event(n):
 				missing_event_count[x] += 1
 
 	s = [(k, missing_event_count[k]) for k in sorted(missing_event_count, key=missing_event_count.get, reverse=True)]
+	
+	out = {}
+	out["title"] = "Number of times an event was ignored in a competition missing %s event%s since %s."%(n, "s" if n>1 else "", start_year)
+	out["labels"] = ["Event", "Number of times missing"]
 
-	out = ["Number of times an event was ignored in a competition missing %s event%s since %s."%(n, "s" if n>1 else "", start_year)]
-	out.append(["Event", "Number of times missing"])
+	table = []
 	for x, y in s:
-		out.append([x, y])
+		table.append([x, y])
+	out["table"] = table
+	
 	return out
 
 def main():

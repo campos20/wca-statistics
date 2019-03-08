@@ -18,7 +18,7 @@ def get_comp_with_n_days(days):
 		for line in tsvin:
 
 			events = len(line[10].split())
-			if events > limit or header:
+			if events <= limit or header:
 				header = False
 				continue
 			
@@ -39,11 +39,11 @@ def get_comp_with_n_days(days):
 				events_number.append(events)
 	
 	out = {}
-	out["title"] = "%s days competition with few events"%days
+	out["title"] = "1 day competition with lots of events"
 	out["labels"] = ["Number of events", "Competition", "Country"]
 	
 	table = []
-	for x, y, z in sorted(zip(events_number, name, country)):
+	for x, y, z in sorted(zip(events_number, name, country))[::-1]:
 		link = "https://www.worldcubeassociation.org/competitions/%s"%y
 		table.append([x, html_link_format(y, link), z])
 	out["table"] = table
@@ -51,8 +51,6 @@ def get_comp_with_n_days(days):
 	return out
 
 def main():
-	"""Usage: python3 stat-3_days_competitions_with_few_events n
-	"""
 
 	args = sys.argv
 	n = 0
@@ -62,9 +60,9 @@ def main():
 	except:
 		n = 3 # we assume n=1
 		
-	page = build_page(get_comp_with_n_days(n))	
+	page = build_page(get_comp_with_n_days(1))	
 	
-	with open("pages/3_days_competitions_with_few_events.html", "w", encoding="utf8") as fout:
+	with open("pages/1_days_competition_with_lots_of_events.html", "w", encoding="utf8") as fout:
 		fout.write(page)
 
 main()

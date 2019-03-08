@@ -43,10 +43,19 @@ else
 		unzip "$export_file" -d "$export_folder"
 	fi
 	
+	# delete possible existing pages
+	for f in $(ls pages); do
+		if [ "$f" != "styles.css" ]; then
+			rm pages/$f
+		fi
+	done
+	
 	echo "Computing statistics..."
 	for f in $(ls src |grep stat*); do
 		echo $f
 		python3 src/$f
 	done
 	echo "Computing done."
+	
+	python3 src/build_main_page.py
 fi

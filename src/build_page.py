@@ -1,3 +1,5 @@
+import json
+
 def build_page(out):
 
 	page = 			""
@@ -5,6 +7,10 @@ def build_page(out):
 	
 	page +=			" <head>\n"
 	page +=			'  <link rel="stylesheet" type="text/css" href="styles.css">\n'
+	
+	page +=			'  <script id="data" type="application/json">'
+	page +=			str(json.dumps(out)) # embed json
+	page +=			'  </script>\n'
 	page +=			" </head>\n"
 	
 	page +=			" <body>\n"
@@ -18,22 +24,30 @@ def build_page(out):
 
 def build_table(out):
 
-	assert len(out) > 2, "The table must have, at least, [header, specs, content..]"
+	assert out["title"], "Title not found"
+	assert out["table"], "Table not found"
 
-	title = out[0]
+	title = out["title"]
 	table = "<h2>%s</h2>\n"%title
+	
+	if "subtitle" in out:
+		table += "<p>%s</p>"%out["subtitle"]
 
 	table += 			'  <table>\n'
 	
-	table +=			"    <tr>\n"
-	for x in out[1]:
-		table +=		"     <th>%s</th>\n"%x
-	table +=			"    </tr>\n"
+	if "labels" in out:
+		table +=			"	<tr>\n"
+		for x in out["labels"]:
+			table +=		"	 <th>%s</th>\n"%x
+		table +=			"	</tr>\n"
 	
-	for x in out[2:]:
+	for x in out["table"]:
+
+		assert type(x) is list, "A list was expected."
+		
 		table += 		"   <tr>\n"
 		for y in x:
-			table +=	"    <td>%s</td>\n"%y
+			table +=	"	<td>%s</td>\n"%y
 		table += 		"   </tr>\n"
 	table += 			"  </table>\n"
 	
