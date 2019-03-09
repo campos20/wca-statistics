@@ -1,4 +1,4 @@
-import csv, sys
+import csv, sys, bisect
 from build_page import build_results
 
 def common_id():
@@ -13,18 +13,17 @@ def common_id():
 		count = []
 		
 		for line in tsvin:
-			wca_id = line[0][4:8]
+			letters = line[0][4:8]
 			
-			if wca_id not in id_list:
-				id_list.append(wca_id)
-				count.append(0)
+			i = bisect.bisect_left(id_list, letters)
+			if i == len(id_list) or letters != id_list[i]:
+				id_list.insert(i, letters)
+				count.insert(i, 0)
 			
-			i = id_list.index(wca_id)
 			count[i] += 1
 		
 		c = 1
 		previous = 0
-		
 		for x, y in sorted(zip(count, id_list))[::-1]:
 		
 			pos = "-"

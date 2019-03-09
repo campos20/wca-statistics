@@ -28,6 +28,8 @@ def main():
 	page +=			date_stamp
 	
 	page += 		'  <table>\n'
+	
+	table = []
 	for f in listdir("pages/"):
 		temp = f.split(".")
 		if temp[0] != "index" and temp[-1] == "html":
@@ -41,7 +43,10 @@ def main():
 				data = json.loads(data)
 				
 				title = data["title"]
-				page += "   <tr><th>%s</th></tr>\n"%html_link_format(title, "%s"%f)
+				table.append([title, "   <tr><th>%s</th></tr>\n"%html_link_format(title, "%s"%f)])
+	
+	for x, y in sorted(table):
+		page += y
 	
 	page +=			" </body>\n"
 

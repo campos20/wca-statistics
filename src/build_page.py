@@ -59,9 +59,12 @@ def build_table(out):
 		table += "<h2>%s</h2>\n"%title
 	
 	if "subtitle" in out:
-		table += "<p>%s</p>"%out["subtitle"]
+		table += "<p>%s</p>\n"%out["subtitle"]
 
 	table += 			'  <table>\n'
+	
+	if "explanation" in out:
+		table += '<p class="explanation">%s</p>\n'%out["explanation"]
 	
 	if "labels" in out:
 		table +=			"	<tr>\n"
