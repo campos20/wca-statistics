@@ -1,7 +1,6 @@
 from utils import *
 from build_page import build_results
 from os import listdir
-from datetime import datetime
 import dateutil.parser
 import json, sys
 

@@ -50,7 +50,8 @@ def build_results(out, args):
 
 def build_table(out):
 
-	assert out["table"], "Table not found"
+	assert out["table"], "Table not found."
+	assert out["title"], "Title not found."
 	
 	table = ""
 

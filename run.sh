@@ -34,12 +34,15 @@ else
 		unzip "$export_file" -d "$export_folder"
 	fi
 	
-	# delete possible existing pages
+	# delete possible existing pages, except css
 	for f in $(ls pages); do
 		if [ "$f" != "styles.css" ] && [ "$f" != "index.css" ]; then
 			rm pages/$f
 		fi
 	done
+	
+	echo "Sorting results..."
+	python3 src/create_sorted_tsv_with_date.py
 	
 	echo "Computing statistics..."
 	for f in $(ls src |grep stat*); do
