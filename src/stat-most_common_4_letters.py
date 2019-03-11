@@ -35,7 +35,7 @@ def common_id():
 			c += 1
 	
 	out = {}
-	out["title"] = "Top %s most common 4 letters in WCA"%limit
+	out["title"] = "Most common 4 letters in WCA"
 	out["labels"] = ["Pos", "Count", "Letters"]
 	out["table"] = table
 	

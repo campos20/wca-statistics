@@ -10,6 +10,9 @@ def sub30_fmc():
 	country_list = []
 	count_list = []
 	max_list = []
+	max_range_start = []
+	max_range_end = []
+	current_range_start = []
 	
 	hold = 30
 	
@@ -35,6 +38,9 @@ def sub30_fmc():
 				country_list.insert(i, country)
 				max_list.insert(i, 0)
 				count_list.insert(i, 0)
+				max_range_start.insert(i, None)
+				max_range_end.insert(i, None)
+				current_range_start.insert(i, None)
 				
 			for x in line[10:13]:
 
@@ -43,17 +49,26 @@ def sub30_fmc():
 					count_list[i] = 0
 				elif 0 < x < hold:
 					count_list[i] += 1
-					max_list[i] = max(max_list[i], count_list[i])
+					
+					competition_id = line[0]
+
+					if count_list[i] >= max_list[i]:
+						max_list[i] = count_list[i]
+						max_range_start[i] = current_range_start[i]
+						max_range_end[i] = competition_id
+					
+					if count_list[i] == 1:
+						current_range_start[i] = competition_id
 
 	out = {}
-	out["title"] = "Most consecutive sub%s FMC"%hold
-	out["labels"] = ["#", "Sub %s streak"%hold, "Name", "Country"]
+	out["title"] = "Most consecutive sub%s streak FMC"%hold
+	out["labels"] = ["#", "Sub %s streak"%hold, "Name", "Country", "Start", "End"]
 	out["explanation"] = 'Ongoing streaks are marked with "+".'
 	
 	table = []
 	count = 1
 	prev = None
-	for streak, wca_id, name, current, country in sorted(zip(max_list, id_list, name_list, count_list, country_list))[::-1]:
+	for streak, wca_id, name, current, country, start, end in sorted(zip(max_list, id_list, name_list, count_list, country_list, max_range_start, max_range_end))[::-1]:
 		if count>LIMIT and prev != streak:
 			break
 		pos = "-"
@@ -61,7 +76,7 @@ def sub30_fmc():
 			pos = str(count)
 		
 		link = get_competitor_link(wca_id)
-		table.append([pos, str(streak)+("+" if streak == current else ""), html_link_format(name, link), country])
+		table.append([pos, str(streak)+("+" if streak == current else ""), html_link_format(name, link), country, get_competition_html_link(start), "" if streak == current else get_competition_html_link(end)])
 		
 		count += 1
 		prev = streak

@@ -71,7 +71,7 @@ def wen_points():
 	out["table"] = table
 	out["labels"] = ["#", "Wen points", "Result", "Name", "Country"]
 	out["title"] = "Wen Points"
-	out["Explanation"] = "A Wen Point is a 333mbld result computed as (cubes solved^2)/(cubes attempted) or efficiency * attempted."
+	out["explanation"] = "A Wen Point is a 333mbld result computed as (cubes solved^2)/(cubes attempted) or efficiency * attempted."
 	
 	return out
 

@@ -20,7 +20,7 @@ else
 	download=true;
 fi
 
-if [ "$download" = true ] ; then
+if [ "$download" = true ]; then
 	echo "Downloading the latest export."
 	wget https://www.worldcubeassociation.org/results/misc/WCA_export.tsv.zip
 fi
@@ -29,9 +29,12 @@ if [ ! -f $export_file ]; then
 	echo "There was an error while downloading.";
 	exit;
 else
-	if [ ! -d "$export_folder" ]; then
+	if [ ! -d "$export_folder" ] || [ "$download" = true ]; then
 		echo "Extracting $export_file"
 		unzip "$export_file" -d "$export_folder"
+		
+		echo "Sorting results..."
+		python3 src/create_sorted_tsv_with_date.py
 	fi
 	
 	# delete possible existing pages, except css
@@ -40,9 +43,6 @@ else
 			rm pages/$f
 		fi
 	done
-	
-	echo "Sorting results..."
-	python3 src/create_sorted_tsv_with_date.py
 	
 	echo "Computing statistics..."
 	for f in $(ls src |grep stat*); do

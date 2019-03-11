@@ -3,6 +3,10 @@ from utils import parse_link
 
 def build_results(out, args):
 	"""Either build a page or show results on terminal."""
+	
+	allowed = ["title", "table", "labels", "subtitle", "explanation"]
+	for x in out:
+		assert x in allowed, "Unrecognized key %s"%x
 
 	build = False
 	for x in args:
@@ -27,6 +31,9 @@ def build_results(out, args):
 		page +=			" <body>\n"
 		body = build_table(out)
 		page += body
+		
+		page += "<p>Send suggestions or report bugs to acampos@worldcubeassociation.org</p>\n"
+		
 		page +=			" </body>\n"
 		
 		page +=			"</html>"
