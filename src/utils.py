@@ -6,7 +6,8 @@ import pandas as pd
 year month day endMonth endDay [5-9]
 eventSpecs wcaDelegate organiser [10-12]
 venue venueAddress venueDetails [13-15]
-external_website cellName latitude longitude [16-19]"""
+external_website cellName latitude longitude [16-19]
+"""
 
 # WCA_export_Results labels
 """competitionId eventId roundTypeId pos [0-3]
@@ -14,6 +15,8 @@ best average personName personId personCountryId [4-8]
 formatId value1 value2 value3 value4 value5 [9-14]
 regionalSingleRecord regionalAverageRecord [15-16]
 """
+# if ordered, then it's added
+# year month day [17-19]
 
 def get_set_wca_events():
 	"""Returns a set with all current WCA events as of
@@ -48,10 +51,6 @@ def parse_link(link):
 
 def get_competitor_link(wca_id):
 	return "https://www.worldcubeassociation.org/persons/%s"%wca_id
-
-def get_competitor_html_link(wca_id):
-	link = "https://www.worldcubeassociation.org/persons/%s"%wca_id
-	return html_link_format(competition_id, link)
 
 def get_competition_html_link(competition_id):
 	link = "https://www.worldcubeassociation.org/competitions/%s"%competition_id
@@ -95,6 +94,7 @@ def largest_range(lista):
 	return (max_r, min_range, max_range)
 
 def time_format(time):
+	time = float(time)/100
 
 	h = int(time/3600)
 	time -= h*3600
