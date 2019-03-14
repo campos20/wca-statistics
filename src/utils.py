@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+from math import *
 
 # WCA_export_Competitions labels
 """id name cityName countryId information [0-4]
@@ -131,3 +132,21 @@ def get_competition_index_in_tsv(competition_id):
 		else: end = i
 	
 	return i
+
+def dist(lat1, lon1, lat2, lon2):
+	# https://stackoverflow.com/questions/19412462/getting-distance-between-two-points-based-on-latitude-longitude
+
+	R = 6373.0
+	
+	lat1 = radians(float(lat1)/pow(10,6))
+	lon1 = radians(float(lon1)/pow(10,6))
+	lat2 = radians(float(lat2)/pow(10,6))
+	lon2 = radians(float(lon2)/pow(10,6))
+
+	dlon = lon2 - lon1
+	dlat = lat2 - lat1
+
+	a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+	c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+	return R*c
