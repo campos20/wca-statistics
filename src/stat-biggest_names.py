@@ -32,7 +32,7 @@ def biggest_names():
 			break
 		if letters != prev:
 			pos = count
-		table.append([pos, str(letters), html_link_format((data["name"])[i], (data["id"])[i]), (data["countryId"])[i]])
+		table.append([pos, str(letters), html_link_format((data["name"])[i], get_competitor_link((data["id"])[i])), (data["countryId"])[i]])
 		count += 1
 		prev = letters
 
