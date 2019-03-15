@@ -61,7 +61,7 @@ def sub30_fmc():
 						current_range_start[i] = competition_id
 
 	out = {}
-	out["title"] = "Most consecutive sub%s streak FMC"%hold
+	out["title"] = "Sub%s streak FMC"%hold
 	out["labels"] = ["#", "Sub %s streak"%hold, "Name", "Country", "Start", "End"]
 	out["explanation"] = 'Ongoing streaks are marked with "+".'
 	

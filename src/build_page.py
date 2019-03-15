@@ -33,6 +33,7 @@ def build_results(out, args):
 		page += body
 		
 		page += "<p>Send suggestions or report bugs to acampos@worldcubeassociation.org</p>\n"
+		page += '<p>This site is open source. Check the code <a href="https://github.com/campos20/wca-statistics/blob/master/src/%s">here</a>.</p>\n'%args[0]
 		
 		page +=			" </body>\n"
 		
