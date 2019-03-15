@@ -45,7 +45,7 @@ else
 	
 	# delete possible existing pages, except css
 	for f in $(ls pages); do
-		if [ "$f" != "styles.css" ] && [ "$f" != "index.css" ]; then
+		if [ "$f" != "styles.css" ]; then
 			rm pages/$f
 		fi
 	done
@@ -58,5 +58,6 @@ else
 	echo "Computing done."
 	
 	python3 src/index.py
+	python3 src/about.py
 	echo "Open pages/index.html for a complete view."
 fi

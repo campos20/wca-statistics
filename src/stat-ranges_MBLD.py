@@ -17,7 +17,7 @@ def largest_range_fmc():
 		for line in tsvin:
 		
 			event = line[1]
-			if skip_header or event != "333fm":
+			if skip_header or event != "333mbf":
 				skip_header = False
 				continue
 			
@@ -30,14 +30,17 @@ def largest_range_fmc():
 				id_list.insert(i, wca_id)
 				lists_of_results.insert(i, [])
 				country_list.insert(i, country)
-			
-			for x in line[10:13]:
-				x=int(x)
-				if x>0:
-					j = bisect.bisect_left(lists_of_results[i], x)
-					if j == len(lists_of_results[i]) or lists_of_results[i][j] != x:
-						lists_of_results[i].insert(j, x)
 
+			for x in line[10:13]:
+				if x in ["-2", "-1", "0"]: continue
+				missed = int(x[-2:])
+				DD = int(x[:2])
+				points = 99-DD
+				
+				j = bisect.bisect_left(lists_of_results[i], points)
+				if j == len(lists_of_results[i]) or lists_of_results[i][j] != points:
+					lists_of_results[i].insert(j, points)
+				
 	name_out = []
 	range_out = []
 	min_out = []
@@ -75,7 +78,7 @@ def largest_range_fmc():
 		
 		prev = a
 	out = {}
-	out["title"] = "Top %s range in FMC"%LIMIT
+	out["title"] = "Range in MBLD"
 	out["explanation"] = "Range here means no gap."
 	out["labels"] = ["#", "Range", "Person", "Country", "Range Start", "Range End"]
 	out["table"] = table

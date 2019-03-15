@@ -1,8 +1,7 @@
-from utils import *
-from build_page import build_results
 from os import listdir
+from utils import html_link_format, get_export_date
 import dateutil.parser
-import json, sys
+import json
 
 # TODO find a better way to do this
 # perhaps making every file a class and use class.get_link and class.get_title
@@ -13,25 +12,14 @@ def main():
 	script_opening = '<script id="data" type="application/json">'
 	script_close = '</script>'
 	
-	page =			"<html>\n"
+	template = open("template/index_template.html", "r", encoding="utf8")
 	
-	# head
-	page +=			" <head>\n"
-	page +=			' <link rel="stylesheet" type="text/css" href="index.css">\n'
-	page +=			" </head>\n"
+	date_stamp = dateutil.parser.parse(get_export_date()).date()
 
-	# body
-	page +=			" <body>\n"
-	page +=			'<h2>Statistics</h2>\n'
-	date_stamp =	'<p class="subtitle">Export date: %s</p>\n'%(dateutil.parser.parse(get_export_date()).date())
-	page +=			date_stamp
-	
-	page += 		'  <table>\n'
-	
 	table = []
 	for f in listdir("pages/"):
 		temp = f.split(".")
-		if temp[0] != "index" and temp[-1] == "html":
+		if "stat-" in temp[0] and temp[-1] == "html":
 			with open("pages/%s"%f, "r", encoding="utf8") as temp:
 			
 				# here we get the content inside each <script>'s page
@@ -42,15 +30,15 @@ def main():
 				data = json.loads(data)
 				
 				title = data["title"]
-				table.append([title, "   <tr><th>%s</th></tr>\n"%html_link_format(title, "%s"%f)])
+				table.append([title, ' <li class="list-group-item list-group-item-action">%s</li>\n'%html_link_format(title, "%s"%f)])
 	
+	replace = '<ul class="list-group">\n'
 	for x, y in sorted(table):
-		page += y
-	
-	page +=			" </body>\n"
+		replace += y
+	replace += '</ul>'
+		
+	page = template.read()%(date_stamp, replace)
 
-	page +=		"</html>\n"
-	
 	with open("pages/index.html", "w", encoding="utf8") as fout:
 		fout.write(page)
 	

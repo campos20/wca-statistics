@@ -43,7 +43,7 @@ def bini_points():
 					competitors_point[i] += 1
 
 	out = {}
-	out["title"] = "Top %s Bini points"%LIMIT
+	out["title"] = "Bini points"
 	out["explanation"] = "A Bini point is a result that ends in 00, excluding FMC, MBLD and results over 10 min."
 	out["labels"] = ["#", "Bini Points", "Name", "Country"]
 	

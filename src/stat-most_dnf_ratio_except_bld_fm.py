@@ -101,7 +101,7 @@ def most_dnf_ratio():
 			prev = ratio_out
 		
 		out["table"] = table
-		out["title"] = "Most DNF ratio excluding BLD and FMC events."
+		out["title"] = "Most DNF ratio excluding BLD and FMC events"
 		out["explanation"] = "Listing people with at least %s solutions."%hold
 	
 		return out
