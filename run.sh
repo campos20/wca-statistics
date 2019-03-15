@@ -2,6 +2,7 @@
 
 export_file="WCA_export.tsv.zip"
 export_folder="WCA_export"
+ordered_file="WCA_export/WCA_export_Results_Ordered.tsv"
 download=false
 
 # First we check if the file exists.
@@ -29,10 +30,15 @@ if [ ! -f $export_file ]; then
 	echo "There was an error while downloading.";
 	exit;
 else
+	order=false;
 	if [ ! -d "$export_folder" ] || [ "$download" = true ]; then
 		echo "Extracting $export_file"
 		unzip "$export_file" -d "$export_folder"
 		
+		order=true;
+	fi
+	
+	if [ ! -f "$ordered_file" ] || [ "$order" = true ]; then
 		echo "Sorting results..."
 		python3 src/create_sorted_tsv_with_date.py
 	fi
