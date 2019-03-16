@@ -12,8 +12,9 @@ def main():
 	script_opening = '<script id="data" type="application/json">'
 	script_close = '</script>'
 	
-	template = open("template/index.html", "r", encoding="utf8").read()
+	template = open("template/basic.html", "r", encoding="utf8").read()
 	header = open("template/header.html", "r", encoding="utf8").read()
+	top = open("template/top.html", "r", encoding="utf8").read()	
 	left_bar = open("template/left_bar.html", "r", encoding="utf8").read()
 	closing = open("template/closing.html", "r", encoding="utf8").read()
 	
@@ -33,14 +34,17 @@ def main():
 				data = json.loads(data)
 				
 				title = data["title"]
-				table.append([title, ' <li class="list-group-item list-group-item-action">%s</li>\n'%html_link_format(title, "%s"%f)])
+				table.append([title, '      <li class="list-group-item list-group-item-action">%s</li>\n'%html_link_format(title, "%s"%f)])
 	
-	content = '<ul class="list-group">\n'
+	content =	'    <div class="col-sm-8">'
+	content +=	'     <p>Export date: %s</p>'%date_stamp
+	content +=	'     <ul class="list-group">\n'
 	for x, y in sorted(table):
 		content += y
-	content += '</ul>'
+	content +=	'     </ul>'
+	content +=	'    </div>'
 		
-	page = template%(header, left_bar, date_stamp, content, closing)
+	page = template%(header, top, left_bar, content, closing)
 
 	with open("pages/index.html", "w", encoding="utf8") as fout:
 		fout.write(page)
