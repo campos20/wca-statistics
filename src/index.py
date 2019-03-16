@@ -12,7 +12,7 @@ def main():
 	script_opening = '<script id="data" type="application/json">'
 	script_close = '</script>'
 	
-	template = open("template/index.html", "r", encoding="utf8").read()
+	template = open("template/basic.html", "r", encoding="utf8").read()
 	header = open("template/header.html", "r", encoding="utf8").read()
 	top = open("template/top.html", "r", encoding="utf8").read()	
 	left_bar = open("template/left_bar.html", "r", encoding="utf8").read()
