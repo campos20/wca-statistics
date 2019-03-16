@@ -12,7 +12,10 @@ def main():
 	script_opening = '<script id="data" type="application/json">'
 	script_close = '</script>'
 	
-	template = open("template/index_template.html", "r", encoding="utf8")
+	template = open("template/index.html", "r", encoding="utf8").read()
+	header = open("template/header.html", "r", encoding="utf8").read()
+	left_bar = open("template/left_bar.html", "r", encoding="utf8").read()
+	closing = open("template/closing.html", "r", encoding="utf8").read()
 	
 	date_stamp = dateutil.parser.parse(get_export_date()).date()
 
@@ -32,12 +35,12 @@ def main():
 				title = data["title"]
 				table.append([title, ' <li class="list-group-item list-group-item-action">%s</li>\n'%html_link_format(title, "%s"%f)])
 	
-	replace = '<ul class="list-group">\n'
+	content = '<ul class="list-group">\n'
 	for x, y in sorted(table):
-		replace += y
-	replace += '</ul>'
+		content += y
+	content += '</ul>'
 		
-	page = template.read()%(date_stamp, replace)
+	page = template%(header, left_bar, date_stamp, content, closing)
 
 	with open("pages/index.html", "w", encoding="utf8") as fout:
 		fout.write(page)

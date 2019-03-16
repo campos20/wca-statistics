@@ -14,6 +14,10 @@ if [ -f $export_file ]; then
 		echo "$export_file is older than 7 days."
 		rm $export_file;
 		download=true;
+		
+		if [ -d "$export_folder" ]; then
+			rm -rR "$export_folder"
+		fi
 	else
 		echo "$export_file is up to date."
 	fi

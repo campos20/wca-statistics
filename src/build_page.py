@@ -14,6 +14,7 @@ def build_results(out, args):
 			var, value = x.split("=")
 			if var == "page" and value == "true":
 				build = True
+				break
 	
 	if build:
 
@@ -22,6 +23,7 @@ def build_results(out, args):
 		
 		page +=			" <head>\n"
 		page +=			'  <link rel="stylesheet" type="text/css" href="styles.css">\n'
+		page +=			'  <title>%s</title>\n'%out["title"]
 		
 		page +=			'  <script id="data" type="application/json">'
 		page +=			str(json.dumps(out)) # embed json

@@ -35,8 +35,9 @@ def common_id():
 			c += 1
 	
 	out = {}
-	out["title"] = "Most common 4 letters in WCA"
-	out["labels"] = ["Pos", "Count", "Letters"]
+	out["title"] = "Most common sub-id"
+	out["labels"] = ["Pos", "Count", "Sub-id"]
+	out["explanation"] = "The sub-id is the 4 letters from each WCA ID."
 	out["table"] = table
 	
 	return out
