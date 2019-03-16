@@ -34,14 +34,17 @@ def main():
 				data = json.loads(data)
 				
 				title = data["title"]
-				table.append([title, ' <li class="list-group-item list-group-item-action">%s</li>\n'%html_link_format(title, "%s"%f)])
+				table.append([title, '      <li class="list-group-item list-group-item-action">%s</li>\n'%html_link_format(title, "%s"%f)])
 	
-	content = '<ul class="list-group">\n'
+	content =	'    <div class="col-sm-8">'
+	content +=	'     <p>Export date: %s</p>'%date_stamp
+	content +=	'     <ul class="list-group">\n'
 	for x, y in sorted(table):
 		content += y
-	content += '</ul>'
+	content +=	'     </ul>'
+	content +=	'    </div>'
 		
-	page = template%(header, top, left_bar, date_stamp, content, closing)
+	page = template%(header, top, left_bar, content, closing)
 
 	with open("pages/index.html", "w", encoding="utf8") as fout:
 		fout.write(page)

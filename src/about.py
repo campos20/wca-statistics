@@ -8,8 +8,12 @@ def main():
 	left_bar = open("template/left_bar.html", "r", encoding="utf8").read()
 	text = open("template/about_text.txt", "r", encoding="utf8").read()
 	closing = open("template/closing.html", "r", encoding="utf8").read()
-		
-	page = template%(header, top, left_bar, text, closing)
+	
+	content = '    <div class="col-sm-8">'
+	content += text
+	content += '    </div>'
+	
+	page = template%(header, top, left_bar, content, closing)
 
 	with open("pages/about.html", "w", encoding="utf8") as fout:
 		fout.write(page)
