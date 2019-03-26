@@ -49,9 +49,7 @@ else
 	
 	# delete possible existing pages, except css
 	for f in $(ls pages); do
-		if [ "$f" != "styles.css" ]; then
-			rm pages/$f
-		fi
+		rm pages/$f
 	done
 	
 	echo "Computing statistics..."
