@@ -9,41 +9,42 @@ import json
 
 def main():
 
-	title_opening = '<title>'
-	title_close = '</title>'
-	
-	template = open("template/basic.html", "r", encoding="utf8").read()
-	header = open("template/header.html", "r", encoding="utf8").read()
-	top = open("template/top.html", "r", encoding="utf8").read()	
-	left_bar = open("template/left_bar.html", "r", encoding="utf8").read()
-	closing = open("template/closing.html", "r", encoding="utf8").read()
-	
-	date_stamp = dateutil.parser.parse(get_export_date()).date()
+    title_opening = '<title>'
+    title_close = '</title>'
+    
+    template = open("template/basic.html", "r", encoding="utf8").read()
+    header = open("template/header.html", "r", encoding="utf8").read()
+    top = open("template/top.html", "r", encoding="utf8").read()
+    nav_bar = open("template/nav_bar.html", "r", encoding="utf8").read()
+    left_bar = open("template/left_bar.html", "r", encoding="utf8").read()
+    closing = open("template/closing.html", "r", encoding="utf8").read()
+    
+    date_stamp = dateutil.parser.parse(get_export_date()).date()
 
-	table = []
-	for f in listdir("pages/"):
-		temp = f.split(".")
-		if "stat-" in temp[0] and temp[-1] == "html":
-			with open("pages/%s"%f, "r", encoding="utf8") as temp:
-			
-				# here we get the title inside each statistics
-				title = temp.read()
-				title = title[title.index(title_opening)+len(title_opening):]
-				title = title[:title.index(title_close)]
-				
-				table.append([title, '      <li class="list-group-item list-group-item-action">%s</li>\n'%html_link_format(title, "%s"%f)])
-	
-	content =	'    <div class="col-sm-8">\n'
-	content +=	'     <p>Export date: %s</p>\n'%date_stamp
-	content +=	'     <ul class="list-group">\n'
-	for x, y in sorted(table):
-		content += y
-	content +=	'     </ul>'
-	content +=	'    </div>'
-		
-	page = template%(header, top, left_bar, content, closing)
+    table = []
+    for f in listdir("pages/"):
+        temp = f.split(".")
+        if "stat-" in temp[0] and temp[-1] == "html":
+            with open("pages/%s"%f, "r", encoding="utf8") as temp:
+            
+                # here we get the title inside each statistics
+                title = temp.read()
+                title = title[title.index(title_opening)+len(title_opening):]
+                title = title[:title.index(title_close)]
+                
+                table.append([title, '      <li class="list-group-item list-group-item-action">%s</li>\n'%html_link_format(title, "%s"%f)])
+    
+    content =    '    <div class="col-sm-8">\n'
+    content +=    '     <p>Export date: %s</p>\n'%date_stamp
+    content +=    '     <ul class="list-group">\n'
+    for x, y in sorted(table):
+        content += y
+    content +=    '     </ul>'
+    content +=    '    </div>'
+        
+    page = template%(header, top, nav_bar, left_bar, content, closing)
 
-	with open("pages/index.html", "w", encoding="utf8") as fout:
-		fout.write(page)
-	
+    with open("pages/index.html", "w", encoding="utf8") as fout:
+        fout.write(page)
+    
 main()

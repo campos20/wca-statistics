@@ -32,6 +32,10 @@ def build_results(out, args):
         page +=            " </head>\n"
         
         page +=            " <body>\n"
+        
+        nav_bar = open("template/nav_bar.html", "r", encoding="utf8").read()
+        page += nav_bar
+        
         body = build_table(out)
         page += body
         

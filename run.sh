@@ -48,7 +48,7 @@ else
     fi
     
     # delete possible existing pages
-    if [ -f pages ]; then
+    if [ -d pages ]; then
         for f in $(ls pages); do
             rm pages/$f
         done
