@@ -9,8 +9,8 @@ import json
 
 def main():
 
-	script_opening = '<script id="data" type="application/json">'
-	script_close = '</script>'
+	title_opening = '<title>'
+	title_close = '</title>'
 	
 	template = open("template/basic.html", "r", encoding="utf8").read()
 	header = open("template/header.html", "r", encoding="utf8").read()
@@ -26,14 +26,11 @@ def main():
 		if "stat-" in temp[0] and temp[-1] == "html":
 			with open("pages/%s"%f, "r", encoding="utf8") as temp:
 			
-				# here we get the content inside each <script>'s page
-				# this will work as long as nothing else goes on each script, except the json of each statistic
-				data = temp.read()
-				data = data[data.index(script_opening)+len(script_opening):]
-				data = data[:data.index("</script>")]
-				data = json.loads(data)
+				# here we get the title inside each statistics
+				title = temp.read()
+				title = title[title.index(title_opening)+len(title_opening):]
+				title = title[:title.index(title_close)]
 				
-				title = data["title"]
 				table.append([title, '      <li class="list-group-item list-group-item-action">%s</li>\n'%html_link_format(title, "%s"%f)])
 	
 	content =	'    <div class="col-sm-8">'

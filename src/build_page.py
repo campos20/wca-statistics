@@ -18,16 +18,14 @@ def build_results(out, args):
 	
 	if build:
 
-		page = 			""
-		page += 			"<html>\n"
+		page = 			"<!DOCTYPE HTML>"
+		page += 		'<html lang="en">\n'
 		
 		page +=			" <head>\n"
 		page +=			'  <link rel="stylesheet" type="text/css" href="styles.css">\n'
 		page +=			'  <title>%s</title>\n'%out["title"]
+		page +=         '  <meta charset="utf-8">'
 		
-		page +=			'  <script id="data" type="application/json">'
-		page +=			str(json.dumps(out)) # embed json
-		page +=			'  </script>\n'
 		page +=			" </head>\n"
 		
 		page +=			" <body>\n"
@@ -72,10 +70,10 @@ def build_table(out):
 	if "subtitle" in out:
 		table += "<p>%s</p>\n"%out["subtitle"]
 
-	table += 			'  <table>\n'
-	
 	if "explanation" in out:
 		table += '<p class="explanation">%s</p>\n'%out["explanation"]
+
+	table += 			'  <table>\n'
 	
 	if "labels" in out:
 		table +=			"	<tr>\n"
