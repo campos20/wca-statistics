@@ -1,5 +1,5 @@
-import json
 from utils import parse_link
+import os
 
 def build_results(out, args):
     """Either build a page or show results on terminal."""
@@ -49,6 +49,8 @@ def build_results(out, args):
             file_name = file_name[-1]
         file_name = file_name.replace(".py", ".html")
         
+        if not os.path.exists("pages"):
+            os.makedirs("pages")
         with open("pages/%s"%file_name, "w", encoding="utf8") as fout:
             fout.write(page)
     
