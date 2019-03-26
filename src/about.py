@@ -1,5 +1,3 @@
-from utils import html_link_format
-
 def main():
 
 	template = open("template/basic.html", "r", encoding="utf8").read()
@@ -9,9 +7,9 @@ def main():
 	text = open("template/about_text.txt", "r", encoding="utf8").read()
 	closing = open("template/closing.html", "r", encoding="utf8").read()
 	
-	content = '    <div class="col-sm-8">'
+	content = '    <div class="col-sm-8">\n'
 	content += text
-	content += '    </div>'
+	content += '    </div>\n'
 	
 	page = template%(header, top, left_bar, content, closing)
 

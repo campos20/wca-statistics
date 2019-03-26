@@ -33,8 +33,8 @@ def main():
 				
 				table.append([title, '      <li class="list-group-item list-group-item-action">%s</li>\n'%html_link_format(title, "%s"%f)])
 	
-	content =	'    <div class="col-sm-8">'
-	content +=	'     <p>Export date: %s</p>'%date_stamp
+	content =	'    <div class="col-sm-8">\n'
+	content +=	'     <p>Export date: %s</p>\n'%date_stamp
 	content +=	'     <ul class="list-group">\n'
 	for x, y in sorted(table):
 		content += y
