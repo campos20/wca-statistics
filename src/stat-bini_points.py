@@ -36,10 +36,8 @@ def bini_points():
 			for x in line[10:15]:
 			
 				time = int(x)
-				if time<=0 or time >= 60000: # time=0, -1 or -2 is either DNF, DNS or no result
-					continue
 
-				if time%100 == 0:
+				if 0<time<60000 and time%100 == 0:
 					competitors_point[i] += 1
 
 	out = {}

@@ -2,7 +2,7 @@ import csv, bisect, sys
 from utils import *
 from build_page import build_results
 
-def most_dnf_ratio():
+def lowest_dnf_ratio():
 
 	with open("WCA_export/WCA_export_Results.tsv") as tsvfile:
 
@@ -108,7 +108,7 @@ def most_dnf_ratio():
 		
 def main():
 	args = sys.argv
-	out = most_dnf_ratio()
+	out = lowest_dnf_ratio()
 	
 	build_results(out, args)
 	
