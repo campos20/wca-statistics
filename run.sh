@@ -58,6 +58,7 @@ else
     fi
     
     cp img/favicon.ico pages/favicon.ico
+    cp img/cover.png pages/cover.png
     
     echo "Computing statistics..."
     for f in $(ls src |grep stat*); do
