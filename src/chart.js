@@ -1,9 +1,9 @@
 // table.js by the respective .py file
-// also label
+// also title
 
 // pages folder gets flushed every time run.sh acts
 // instead of adding an if to prevent it from being erased,
-// we create a copy using src/stat-number_of_new_competitors_year.py
+// we create a copy using the respective .py file
 
 // Load the Visualization API and the corechart package.
 google.charts.load('current', {'packages':['corechart']});

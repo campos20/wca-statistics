@@ -34,6 +34,7 @@ if [ ! -f $export_file ]; then
     echo "There was an error while downloading.";
     exit;
 else
+
     order=false;
     if [ ! -d "$export_folder" ] || [ "$download" = true ]; then
         echo "Extracting $export_file"
@@ -52,7 +53,11 @@ else
         for f in $(ls pages); do
             rm pages/$f
         done
+    else
+        mkdir pages
     fi
+    
+    cp img/favicon.ico pages/favicon.ico
     
     echo "Computing statistics..."
     for f in $(ls src |grep stat*); do

@@ -42,11 +42,15 @@ def build_results(out, args):
         closing = open("template/closing.html", "r", encoding="utf8").read()
 
         page = open("template/stat.html", "r", encoding="utf8").read()%(header, nav_bar, formated_title, explanation, content, footer, closing)
-        
+                
         if not os.path.exists("pages"):
             os.makedirs("pages")
         with open("pages/%s.html"%file_name, "w", encoding="utf8") as fout:
             fout.write(page)
+        
+        # copy favicon if needed
+        if not os.path.isfile('pages/favicon.ico'):
+            os.popen("cp img/favicon.ico pages/favicon.ico")
     
     else:
         labels = out["labels"]

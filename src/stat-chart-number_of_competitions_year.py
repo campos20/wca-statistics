@@ -73,7 +73,7 @@ def new_competitors():
     
     header = open("template/header.html", "r", encoding="utf8").read()%title
     nav_bar = open("template/nav_bar.html", "r", encoding="utf8").read()
-    footer = (open("template/footer.html", "r", encoding="utf8").read())%("src/%s.py"%file_name)
+    footer = (open("template/footer.html", "r", encoding="utf8").read())%("%s"%file_name)
     closing = open("template/closing.html", "r", encoding="utf8").read()
     
     # here we create a js just to be used
