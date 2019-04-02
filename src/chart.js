@@ -5,20 +5,38 @@
 // instead of adding an if to prevent it from being erased,
 // we create a copy using the respective .py file
 
-// Load the Visualization API and the corechart package.
 google.charts.load('current', {'packages':['corechart']});
-
-// Set a callback to run when the Google Visualization API is loaded.
 google.charts.setOnLoadCallback(drawChart);
 
-// Callback that creates and populates a data table,
-// instantiates the pie chart, passes in the data and
-// draws it.
+function getParameterByName(name) {
+  // https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+  let url = window.location.href;
+  name = name.replace(/[\[\]]/g, '\\$&');
+  var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+      results = regex.exec(url);
+  if (!results) return null;
+  if (!results[2]) return '';
+  return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+function updateQueryStringParameter(key, value) {
+
+  let uri = window.location.href;
+  let re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+  let separator = uri.indexOf('?') !== -1 ? "&" : "?";
+  if (uri.match(re)) {
+    uri = uri.replace(re, '$1' + key + "=" + value + '$2');
+  }
+  else {
+    uri = uri + separator + key + "=" + value;
+  }
+  window.history.replaceState('', '', uri);
+}
+
 function drawChart() {
 
-  var selector = document.getElementById("selector");
-  var country = selector.options[selector.selectedIndex].value;
-  selector.addEventListener("change", drawChart);
+  country = selector.options[selector.selectedIndex].value;
+  updateQueryStringParameter("country", country);
 
   var array = [];
   array.push(["Year", label, {role: 'annotation' }]);
@@ -45,3 +63,15 @@ function drawChart() {
   
   chart.draw(data, options);
 }
+
+var selector = document.getElementById("selector");
+var country = getParameterByName("country");
+if (country !== null) {
+ for (var i=0; i<selector.length; i++) {
+  if (selector[i].value === country) {
+    selector.selectedIndex = i;
+    break;
+  } 
+ }
+}
+selector.addEventListener("change", drawChart);

@@ -5,9 +5,8 @@ from bisect import bisect_left
 # for google chart
 pre_header = """
     <!--Load the AJAX API-->
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="tempCompetitionData.js"></script>
-    <script type="text/javascript" src="chart.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="tempCompetitorData.js"></script>
 """
 
 content = """
@@ -15,6 +14,7 @@ content = """
 %s
      <div id="chart_div"></div>
     </div>
+    <script src="chart.js"></script>
 """
 
 page = open("template/stat.html", "r", encoding="utf8").read()
