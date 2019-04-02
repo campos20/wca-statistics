@@ -44,6 +44,9 @@ function drawChart() {
     array.push([key, tableData[country][key], tableData[country][key]]);
   }
 
+  console.log(country);
+  console.log(array);
+
   // Create the data table.
   var data = new google.visualization.arrayToDataTable(array);
   

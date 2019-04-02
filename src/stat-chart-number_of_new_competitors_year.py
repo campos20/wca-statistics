@@ -50,7 +50,7 @@ def new_competitors():
             temp[years[i][j]] = count[i][j]
         d[countries[i]] = temp
     
-    out = json.dumps(d, sort_keys=True)
+    out = json.dumps(d, indent=2, sort_keys=True)
     
     selector_element = '      <option>%s</option>\n'
     selector = '     <select id="selector">\n'
@@ -96,6 +96,6 @@ def new_competitors():
         fout.write(page%(pre_header+header, nav_bar, title, explanation, content%selector, footer, closing))
     
 def main():
-    out = new_competitors()
+    new_competitors()
     
 main()

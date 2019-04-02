@@ -6,7 +6,6 @@ from bisect import bisect_left
 pre_header = """
     <!--Load the AJAX API-->
     <script src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="tempCompetitorData.js"></script>
 """
 
 content = """
@@ -14,6 +13,7 @@ content = """
 %s
      <div id="chart_div"></div>
     </div>
+    <script src="tempCompetitionData.js"></script>
     <script src="chart.js"></script>
 """
 
@@ -34,7 +34,7 @@ def new_competitors():
             countries.insert(i, country)
             years.insert(i, [])
             count.insert(i, [])
-        
+
         j = bisect_left(years[i], year)
         if j == len(years[i]) or years[i][j] != year:
             years[i].insert(j, year)
@@ -48,12 +48,28 @@ def new_competitors():
         for j in range(len(years[i])):
             temp[years[i][j]] = count[i][j]
         d[countries[i]] = temp
+
+
+    # https://github.com/thewca/worldcubeassociation.org/blob/16cdcd4d443dfae8be81ae1cdfd5f224a444f6f4/WcaOnRails/app/models/country.rb#L26
+    multiple = {}
+    multiple['XF'] = 'Multiple Countries (Africa)'
+    multiple['XM'] = 'Multiple Countries (Americas)'
+    multiple['XA'] = 'Multiple Countries (Asia)'
+    multiple['XE'] = 'Multiple Countries (Europe)'
+    multiple['XN'] = 'Multiple Countries (North America)'
+    multiple['XO'] = 'Multiple Countries (Oceania)'
+    multiple['XS'] = 'Multiple Countries (South America)'
+    multiple['XW'] = 'Multiple Countries (World)'
+
+    for x in d:
+        if len(x) == 2 and x in multiple:
+            d[multiple[x]] = d.pop(x)
     
-    out = json.dumps(d, sort_keys=True)
+    out = json.dumps(d, indent=2, sort_keys=True)
     
     selector_element = '      <option>%s</option>\n'
     selector = '     <select id="selector">\n'
-    for country in countries:
+    for country in d:
         selector += selector_element%country
     selector += '     </select>\n'
     
@@ -78,7 +94,7 @@ def new_competitors():
     
     # here we create a js just to be used
     data = 'var label = "Competitions";\n'
-    data += "var title = 'Number of competitions by year';"
+    data += "var title = 'Number of competitions by year';\n"
     data += "var tableData = %s;\n"%out
     with open("pages/tempCompetitionData.js", "w", encoding="utf8") as fout:
         fout.write(data)
@@ -95,6 +111,6 @@ def new_competitors():
         fout.write(page%(pre_header+header, nav_bar, title, explanation, content%selector, footer, closing))
     
 def main():
-    out = new_competitors()
+    new_competitors()
     
 main()
