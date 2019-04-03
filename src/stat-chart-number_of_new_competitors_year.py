@@ -1,6 +1,9 @@
 import json, sys
 import pandas as pd
 from bisect import bisect_left
+from utils import *
+
+# There's a better explanation on how this works commented in the file stat-chart-number_of_competitions_year.py
 
 # for google chart
 pre_header = """
@@ -42,6 +45,15 @@ def new_competitors():
             count[i].insert(j, 0)
         
         count[i][j] += 1
+
+    # fill in gaps
+    for i in range(len(countries)):
+        j = 1
+        while j<len(years[i]):
+            while years[i][j-1] != years[i][j]-1 and years[i][j-1] != 1982:
+                years[i].insert(j, years[i][j]-1) 
+                count[i].insert(j, 0)
+            j += 1
     
     d = {}
     for i in range(len(countries)):
@@ -49,16 +61,60 @@ def new_competitors():
         for j in range(len(years[i])):
             temp[years[i][j]] = count[i][j]
         d[countries[i]] = temp
+
+    # Continents are handled separetely
+    continent_dict = {}
+    for x in d:
+        continent = find_continent(x)
+        if continent not in continent_dict:
+            continent_dict[continent] = {}
+        for year in d[x]:
+            if year not in continent_dict[continent]:
+                continent_dict[continent][year] = 0
+            continent_dict[continent][year] += d[x][year]
+
+    # World, sum of competitions in continents
+    world = {}
+    world["World"] = {} # handle the same way the other dicts
+    for x in continent_dict:
+        for year in continent_dict[x]:
+            if year not in world["World"]:
+                world["World"][year] = 0
+            world["World"][year] += continent_dict[x][year]
     
-    out = json.dumps(d, indent=2, sort_keys=True)
+    # This dict will be converted to js object
+    out = {}
+    for x in d:
+        out[x] = d[x]
+    out.update(continent_dict) # Therefore, we can append continents
+    out.update(world) # And world
+    out = json.dumps(out, indent=2, sort_keys=True)
     
-    selector_element = '      <option>%s</option>\n'
+    # Create html selector
+    selector_element = '       <option>%s</option>\n'
     selector = '     <select id="selector">\n'
-    for country in countries:
+
+    # Add world region
+    selector += '      <optgroup>'
+    selector += selector_element%"World"
+    selector += '      </optgroup>'
+
+    # Add continents to selector
+    selector += '      <optgroup>'
+    continent_list = sorted([x for x in continent_dict])
+    for continent in continent_list:
+        selector += selector_element%continent
+    selector += '      </optgroup>'
+
+    # Add countries
+    selector += '      <optgroup>'
+    for country in d:
         selector += selector_element%country
+    selector += '      </optgroup>'
+    
     selector += '     </select>\n'
     
-    title = "Number of new competitors in each year by country"
+    title = "Number of new competitors in each year by region"
     
     args = sys.argv
     

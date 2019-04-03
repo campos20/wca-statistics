@@ -150,3 +150,17 @@ def dist(lat1, lon1, lat2, lon2):
 	c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
 	return R*c
+
+def find_continent(countryId):
+    data = pd.read_csv("WCA_export/WCA_export_Countries.tsv", sep = "\t")
+    continentId = data[data["id"] == countryId]["continentId"].to_string(index=False).strip()
+
+    data = pd.read_csv("WCA_export/WCA_export_Continents.tsv", sep = "\t")
+    continent = data[data["id"] == continentId]["name"].to_string(index=False).strip()
+
+    return continent
+
+def find_name(countryId):
+    data = pd.read_csv("WCA_export/WCA_export_Countries.tsv", sep = "\t")
+    name = data[data["id"] == countryId]["name"].to_string(index=False).strip()
+    return name

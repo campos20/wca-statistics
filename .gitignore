@@ -1,7 +1,8 @@
 # temporary files
-WCA_export.tsv.zip
+*.zip
 *.pyc
 pages/
+*.sql
 
 WCA_export/
 src/__pycache__
