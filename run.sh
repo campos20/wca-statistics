@@ -12,12 +12,18 @@ if [ -f $export_file ]; then
     
     if (( date_of_export <= one_week )); then # Here we check how old the export is.
         echo "$export_file is older than 7 days."
+        echo "Cleaning old data."
+        
         rm $export_file;
         download=true;
         
         if [ -d "$export_folder" ]; then
             rm -rR "$export_folder"
         fi
+
+        # remove developer export and the database
+        rm wca-developer-database-dump*
+        sudo mysql -e "DROP DATABASE IF EXISTS WCA;"
     else
         echo "$export_file is up to date."
     fi
@@ -28,6 +34,7 @@ fi
 if [ "$download" = true ]; then
     echo "Downloading the latest export."
     wget https://www.worldcubeassociation.org/results/misc/WCA_export.tsv.zip
+    wget https://www.worldcubeassociation.org/wst/wca-developer-database-dump.zip
 fi
 
 if [ ! -f $export_file ]; then
@@ -39,6 +46,10 @@ else
     if [ ! -d "$export_folder" ] || [ "$download" = true ]; then
         echo "Extracting $export_file"
         unzip "$export_file" -d "$export_folder"
+
+        # create a new database and its outputs
+        unzip wca-developer-database-dump.zip
+        sh ./generate-output-from-database.sh
         
         order=true;
     fi
