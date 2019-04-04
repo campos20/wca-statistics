@@ -1,6 +1,6 @@
 if ! sudo bash -c '[[ -d "/var/lib/mysql/WCA" ]]'
 then
-	echo "Building the database. This will take a while"
+	echo "Building the database. This will take a while."
 	sudo mysql -e "CREATE DATABASE WCA; USE WCA; SOURCE wca-developer-database-dump.sql;"
 	echo "Finally done."
 fi

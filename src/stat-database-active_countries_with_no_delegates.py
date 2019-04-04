@@ -1,17 +1,15 @@
 import bisect, csv, datetime, sys
 from build_page import build_results
 
-# This stat uses some data from developer export (get the number of active delegates). So, make sure you run
-# "generate-output-from-database.sh" before running this and that
-# the developer export is downloaded and extracted.
+# This is basically the NA countries from stat-database-ratio_delegates_competitors_last_year.py
 
-def ratio_competitors_delegates():
+def no_delegates():
 
 	days = 365
 	
 	countries_delegates = []
-	number_of_delegates = []
 
+	# the file is there already, so we can use it
 	file = open("database_out/stat-database-ratio_delegates_competitors_last_year.txt", "r").readlines()
 
 	for line in file:
@@ -21,7 +19,6 @@ def ratio_competitors_delegates():
 			country = " ".join(temp[:-1])
 
 			i = bisect.bisect_left(countries_delegates, country) # USA messes with ordering (capitalization), so here we sort this again (mysql isn't case sensitive for this matter)
-			number_of_delegates.insert(i, delegates)
 			countries_delegates.insert(i, country)
 
 	competitors_last_year = []
@@ -34,7 +31,7 @@ def ratio_competitors_delegates():
 
 	tsvfile = open("WCA_export/WCA_export_Results_Ordered.tsv", "r")
 	tsvreader = csv.reader(tsvfile, delimiter="\t")
-	next(tsvreader, None)
+	next(tsvreader, None) # skip header
 	for line in tsvreader: # bisect here?
 		year, month, day = map(int, [line[17], line[18], line[19]])
 		date = datetime.date(year, month, day)
@@ -54,41 +51,37 @@ def ratio_competitors_delegates():
 				competitors_id[i].insert(j, person_id)
 				competitors_names[i].insert(j, person_name)
 
-	ratios = []
-	competitors_out = []
-	for i in range(len(countries_delegates)):
-		country = countries_delegates[i]
-		delegates = number_of_delegates[i]
-
-		j = bisect.bisect_left(countries_persons, country)
-		number_of_competitors = len(competitors_id[j])
-		competitors_out.append(number_of_competitors)
-
-		ratio = 1.0*number_of_competitors/delegates # 0 division is already avoided
-		ratios.append(ratio)
-
 	table = []
+	no_delegates_country = []
+	competitors_no_delegates = []
+	for i in range(len(countries_persons)):
+		country = countries_persons[i]
+		j = bisect.bisect_left(countries_delegates, country)
+
+		if j == len(countries_delegates) or countries_delegates[j] != country:
+			no_delegates_country.append(country)
+			competitors_no_delegates.append(len(competitors_id[i]))
+
 	c = 1
 	prev = None
-	for ratio, country, competitors, delegates in sorted(zip(ratios, countries_delegates, competitors_out, number_of_delegates))[::-1]:
-		ratio_display = "%.2f"%ratio
+	for competitors, country in sorted(zip(competitors_no_delegates, no_delegates_country))[::-1]:
 		pos = c
-		if ratio_display == prev:
+		if competitors == prev:
 			pos = "-"
-		table.append([pos, ratio_display, country, competitors, delegates])
+		table.append([pos, competitors, country])
 		c += 1
-		prev = ratio_display
+		prev = competitors
 
 	out = {}
-	out["title"] = "Ratio between number of active competitors in the last %s days and active delegates"%days
-	out["labels"] = ["Pos", "Ratio", "Country", "Active competitors", "Delegates"]
-	out["explanation"] = 'That is: active competitors/delegates. It\'s the virtual number each delegate had to handle in the past %s days (if everyone just competed in the home country). So, for the first position, %s, each one of the %s delegates had to deal with %s competitors on average in the past %s days. <a href="stat-database-ratio_delegates_competitors_last_year.html">Related</a>.'%(days, table[0][2], table[0][4], table[0][1], days)
+	out["title"] = "Active countries with no delegates in the last %s days"%days
+	out["labels"] = ["Pos", "Active competitors", "Country"]
+	out["explanation"] = '<a href="stat-database-ratio_delegates_competitors_last_year.html">Related</a>.'
 	out["table"] = table
 	return out
 
 def main():
 	args = sys.argv
-	out = ratio_competitors_delegates()
+	out = no_delegates()
 	build_results(out, args)
 
 if __name__ == "__main__":
