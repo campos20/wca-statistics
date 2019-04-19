@@ -34,8 +34,10 @@ def iso_2_id(region_iso):
 
 def get_next_competition(person_id, current_competition, event):
     idx = results[(results["competitionId"] == current_competition) & (results["eventId"] == event)].index.values[-1]
-    competition = results[(results.index > idx) & (results["eventId"] == event) & (results["personId"] == person_id)]["competitionId"].values[0]
-    return competition 
+    df = results[(results.index > idx) & (results["eventId"] == event) & (results["personId"] == person_id)]["competitionId"]
+    if df.empty:
+        return
+    return df.values[0]
 
 def walk_path(region_iso, event, start_date = None, region = None, championship = None, champion = None, champion_id = None):
 
@@ -50,6 +52,8 @@ def walk_path(region_iso, event, start_date = None, region = None, championship 
         print("New champion:", champion, champion_id, championship)
     else:
         next_competition = get_next_competition(champion_id, championship, event)
+        if next_competition == None:
+            return
         regional_winner, regional_winner_id = get_regional_champion(next_competition, region, event)
 
         if regional_winner_id != champion_id:
@@ -64,7 +68,7 @@ def walk_path(region_iso, event, start_date = None, region = None, championship 
 def unofficial_official():
 
     region_iso = "US"
-    event = "444"
+    event = "333bf"
     walk_path(region_iso, event)
 
 def main():
