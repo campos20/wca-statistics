@@ -2,6 +2,7 @@ import pandas as pd
 import sys
 
 def main():
+	"""This saves time in development. There's no need to go trhough all the database."""
 
 	year = int(sys.argv[1])
 
