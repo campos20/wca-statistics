@@ -1,14 +1,16 @@
 import pandas as pd
-from datetime import date
 
 championships = pd.read_csv("WCA_export/WCA_export_championships.tsv", sep="\t")
 competitions = pd.read_csv("WCA_export/WCA_export_Competitions.tsv", sep="\t")
 countries = pd.read_csv("WCA_export/WCA_export_Countries.tsv", sep="\t")
+
 results = pd.read_csv("WCA_export/WCA_export_Results_Ordered.tsv", sep="\t")
+results = results.drop(columns=["value1", "value2", "value3", "value4", "value5", "regionalSingleRecord", "regionalAverageRecord", "average"]) # drop some values
+results["date"] = results['date'].astype('datetime64[ns]')
 
 def get_competition_date(competition):
     year, month, day = competitions[competitions["id"] == competition][["year", "month", "day"]].values[0]
-    return date(year, month, day)
+    return pd.Timestamp(year, month, day)
 
 def get_next_championship_with_date(region, start_date = None):
 
@@ -32,11 +34,12 @@ def get_regional_champion(competition, region, event):
 def iso_2_id(region_iso):
     return countries[countries["iso2"] == region_iso]["id"].values[0]
 
-def get_next_competition(person_id, current_competition, event):
-    idx = results[(results["competitionId"] == current_competition) & (results["eventId"] == event)].index.values[-1]
-    df = results[(results.index > idx) & (results["eventId"] == event) & (results["personId"] == person_id)]["competitionId"]
+def get_next_competition_with_date(person_id, date, event):
+    df = results[(results["date"] > date) & (results["date"] <= date + pd.DateOffset(years = 1)) & (results["eventId"] == event) & (results["personId"] == person_id)]["competitionId"]
+    print(df)
+
     if df.empty:
-        return
+        return None, None
     return df.values[0]
 
 def walk_path(region_iso, event, start_date = None, region = None, championship = None, champion = None, champion_id = None):
@@ -51,7 +54,7 @@ def walk_path(region_iso, event, start_date = None, region = None, championship 
         champion, champion_id = get_regional_champion(championship, region, event)
         print(champion, champion_id, championship)
     else:
-        next_competition = get_next_competition(champion_id, championship, event)
+        next_competition, start_date = get_next_competition_with_date(champion_id, start_date, event)
         if next_competition == None:
             return
         regional_winner, regional_winner_id = get_regional_champion(next_competition, region, event)
