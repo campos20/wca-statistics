@@ -42,7 +42,7 @@ def main():
 	# this assumes that this is the possible order of roundTypeId
 	# ['0', '1', '2', '3', 'b', 'c', 'd', 'e', 'f', 'h']
 	# I'm not quite sure about this just yet
-	data_results.sort_values(by=["year", "month", "day", "competitionId", "eventId", "roundTypeId", "pos"], ascending=True, inplace=True)
+	data_results.sort_values(by=["year", "month", "day", "competitionId", "eventId", "roundTypeId", "pos"], ascending=[True, True, True, True, True, True, False], inplace=True)
 	
 	data_results.to_csv("WCA_export/WCA_export_Results_Ordered.tsv", sep='\t', encoding='utf-8', index=False)
 
