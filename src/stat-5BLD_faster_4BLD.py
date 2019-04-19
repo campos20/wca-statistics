@@ -44,9 +44,7 @@ def compare_results(ev1, ev2):
 					first_results[i][j] = best
 					first_competition[i][j] = competition
 					
-					year = int(line[17])
-					month = int(line[18])
-					day = int(line[19])
+					year, month, day = map(int, line[17].split("-"))
 					date = datetime.date(year, month, day)
 					first_date[i][j] = date
 				
@@ -54,9 +52,7 @@ def compare_results(ev1, ev2):
 					first_results[i][j] = best
 					first_competition[i][j] = competition
 					
-					year = int(line[17])
-					month = int(line[18])
-					day = int(line[19])
+					year, month, day = map(int, line[17].split("-"))
 					date = datetime.date(year, month, day)
 					first_date[i][j] = date
 					

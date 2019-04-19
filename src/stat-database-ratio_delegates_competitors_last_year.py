@@ -36,7 +36,7 @@ def ratio_competitors_delegates():
 	tsvreader = csv.reader(tsvfile, delimiter="\t")
 	next(tsvreader, None)
 	for line in tsvreader: # bisect here?
-		year, month, day = map(int, [line[17], line[18], line[19]])
+		year, month, day = map(int, line[17].split("-"))
 		date = datetime.date(year, month, day)
 		if date + datetime.timedelta(days=days) >= today:
 			person_name = line[6]

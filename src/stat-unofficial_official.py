@@ -49,7 +49,7 @@ def walk_path(region_iso, event, start_date = None, region = None, championship 
     
     if champion_id == None: # TODO join this within the else
         champion, champion_id = get_regional_champion(championship, region, event)
-        print("New champion:", champion, champion_id, championship)
+        print(champion, champion_id, championship)
     else:
         next_competition = get_next_competition(champion_id, championship, event)
         if next_competition == None:
@@ -57,7 +57,7 @@ def walk_path(region_iso, event, start_date = None, region = None, championship 
         regional_winner, regional_winner_id = get_regional_champion(next_competition, region, event)
 
         if regional_winner_id != champion_id:
-            print("New champion:", regional_winner, regional_winner_id, next_competition)
+            print(regional_winner, regional_winner_id, next_competition)
 
         championship = next_competition
         champion = regional_winner
@@ -68,7 +68,7 @@ def walk_path(region_iso, event, start_date = None, region = None, championship 
 def unofficial_official():
 
     region_iso = "US"
-    event = "333bf"
+    event = "333"
     walk_path(region_iso, event)
 
 def main():

@@ -1,5 +1,6 @@
 import pandas as pd
 import bisect
+from datetime import date
 
 def main():
 	"""This sorts (date, competition, round) WCA_export_Results and creates a new tsv so it can be reused for other programs."""
@@ -11,10 +12,7 @@ def main():
 	# This messes with bisect, so we create a competitionId list all caps
 	competition_id_competition_all_caps =[x.upper() for x in data_competition["id"]]
 	
-	# first we build columns with year, month and date to place with results
-	years = []
-	months = []
-	days = []
+	dates = []
 	
 	prev = None
 	year = None
@@ -27,22 +25,19 @@ def main():
 			year = (data_competition["year"])[i]
 			month = (data_competition["month"])[i]
 			day = (data_competition["day"])[i]
-		years.append(year)
-		months.append(month)
-		days.append(day)
-		
+		dates.append(date(year, month, day))
 		prev = competitionId
 	
-	data_results["year"] = years
-	data_results["month"] = months
-	data_results["day"] = days
-	
+	data_results["date"] = dates
+	data_results['date'].astype('datetime64[ns]')
+	print(data_results["date"])
+
 	del data_competition, competition_id_competition_all_caps
 	
 	# this assumes that this is the possible order of roundTypeId
 	# ['0', '1', '2', '3', 'b', 'c', 'd', 'e', 'f', 'h']
 	# I'm not quite sure about this just yet
-	data_results.sort_values(by=["year", "month", "day", "competitionId", "eventId", "roundTypeId", "pos"], ascending=[True, True, True, True, True, True, False], inplace=True)
+	data_results.sort_values(by=["date", "competitionId", "eventId", "roundTypeId", "pos"], ascending=[True, True, True, True, False], inplace=True)
 	
 	data_results.to_csv("WCA_export/WCA_export_Results_Ordered.tsv", sep='\t', encoding='utf-8', index=False)
 
