@@ -30,7 +30,6 @@ def main():
 	
 	data_results["date"] = dates
 	data_results['date'].astype('datetime64[ns]')
-	print(data_results["date"])
 
 	del data_competition, competition_id_competition_all_caps
 	
