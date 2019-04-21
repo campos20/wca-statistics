@@ -46,13 +46,19 @@ def get_next_championship_with_date(region, event, start_date = None):
     return championship, dt
 
 def get_regional_champion(competition, region, event, blacklist = []):
-    df = results[(results["competitionId"] == competition) & (results["eventId"] == event) & (results["personCountryId"] == region)][["personName", "personId"]]
-    df = df.reindex(index = df.index[::-1])
-    for index, row in df.iterrows():
-        champion, champion_id = row[["personName", "personId"]]
-        if champion_id not in blacklist:
-            return champion, champion_id
-    return None, None
+    df = results[(results["competitionId"] == competition) & (results["eventId"] == event) & (results["personCountryId"] == region) & (~results["personId"].isin(blacklist))]
+    if df.empty:
+        return []
+
+    # In case competition had multiple rounds, we take just the last one.
+    # Eventually, this will go back to previous rounds if blacklist goes to crowded
+    final_round = df["roundTypeId"].values[-1]
+
+    winning_pos = df[df["roundTypeId"] == final_round]["pos"].values[-1] # Helps in ties.
+
+    winners_list = df[(df["pos"] == winning_pos) & (df["roundTypeId"] == final_round)][["personId", "personName"]].values
+    print(winners_list)
+    return winners_list
 
 def iso_2_id(region_iso):
     return countries[countries["iso2"] == region_iso]["id"].values[0]
@@ -75,14 +81,15 @@ def look_back(person_id, date, event, region):
     competitions = get_previous_competitions(person_id, date, event)
     blacklist = [person_id]
     for competition in competitions[::-1]:
-        champion, champion_id = get_regional_champion(competition, region, event, blacklist)
-        if champion_id != None:
-            next_competition, next_date = get_next_competition_with_date(champion_id, date, event)
+        winners = get_regional_champion(competition, region, event, blacklist)
+        if len(winners) > 0:
+            for champion_id, winner in winners:
+                next_competition, next_date = get_next_competition_with_date(champion_id, date, event)
             if next_competition == None: # In this case, the next champion also has gone idle.
                 blacklist.append(champion_id)
             else:
-                return champion, champion_id
-    return None, None
+                return winners
+    return []
 
 def walk_path(region_iso, event, start_date = None, region = None, championship = None, champion = None, champion_id = None):
 
@@ -94,39 +101,48 @@ def walk_path(region_iso, event, start_date = None, region = None, championship 
         championship, start_date = get_next_championship_with_date(region_iso, event, start_date)
     
     if champion_id == None: # TODO join this within the else
-        champion, champion_id = get_regional_champion(championship, region, event)
-        final[region_iso][event].append([champion, champion_id, championship, "New"])
+        winners = get_regional_champion(championship, region, event)
+        for winner in winners:
+            champion_id, champion = winner
+            final[region_iso][event].append([champion, champion_id, championship, "New"])
+            walk_path(region_iso, event, start_date, region, championship, champion, champion_id)
+            return
     else:
         prev_date = start_date
         next_competition, start_date = get_next_competition_with_date(champion_id, start_date, event)
         if next_competition == None:
             if prev_date + pd.DateOffset(years = 1) <= last_date:
                 # Competitor did not compete for 1 year
-                champion, champion_id = look_back(champion_id, prev_date, event, region)
-                if champion_id == None:
-                    championship, start_date = get_next_championship_with_date(region_iso, event, start_date)
-                    if championship == None:
-                        print("Terminating")
-                        return
-                    else:
-                        print("Fresh new start")
-                        # Fresh new start logic goes here
-                        return
-                    return
-                else:
-                    final[region_iso][event].append([champion, champion_id, championship, "Inactive"])
-                    walk_path(region_iso, event, prev_date, region, championship, champion, champion_id)
-                    return
+                winners = look_back(champion_id, prev_date, event, region)
+                if len(winners) > 0:
+                    for winner in winners:
+                        champion_id, champion = winner
+                        if champion_id == None:
+                            championship, start_date = get_next_championship_with_date(region_iso, event, start_date)
+                            if championship == None:
+                                print("Terminating")
+                                return
+                            else:
+                                print("Fresh new start")
+                                # Fresh new start logic goes here
+                                return
+                            return
+                        else:
+                            final[region_iso][event].append([champion, champion_id, championship, "Inactive"])
+                            walk_path(region_iso, event, prev_date, region, championship, champion, champion_id)
+#                            return
             return
-        regional_winner, regional_winner_id = get_regional_champion(next_competition, region, event)
+        winners_list = get_regional_champion(next_competition, region, event)
+        for winners in winners_list:
+            regional_winner_id, regional_winner = winners
+            if regional_winner_id != champion_id:
+                final[region_iso][event].append([regional_winner, regional_winner_id, next_competition, "New"])
+                champion_id = regional_winner_id
+                champion = regional_winner
+            walk_path(region_iso, event, start_date, region, championship, champion, champion_id)
+            return
 
-        if regional_winner_id != champion_id:
-            final[region_iso][event].append([regional_winner, regional_winner_id, next_competition, "New"])
-
-        championship = next_competition
-        champion = regional_winner
-        champion_id = regional_winner_id
-    
+        championship = next_competition        
     walk_path(region_iso, event, start_date, region, championship, champion, champion_id)
 
 def unofficial_official():
@@ -135,6 +151,7 @@ def unofficial_official():
     final[region_iso] = {}
 
     for event in sorted(list(get_set_wca_events())):
+        event = "333fm"
 
         final[region_iso][event] = []
 
@@ -144,6 +161,7 @@ def unofficial_official():
         print(event)
         for x in final[region_iso][event]:
             print(x)
+        break
 
 def main():
     unofficial_official()
