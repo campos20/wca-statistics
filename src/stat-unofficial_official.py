@@ -1,5 +1,7 @@
+import bisect
 import pandas as pd
 from utils import get_set_wca_events
+
 championships = pd.read_csv("WCA_export/WCA_export_championships.tsv", sep="\t")
 competitions = pd.read_csv("WCA_export/WCA_export_Competitions.tsv", sep="\t")
 countries = pd.read_csv("WCA_export/WCA_export_Countries.tsv", sep="\t")
@@ -10,6 +12,35 @@ results["date"] = results['date'].astype('datetime64[ns]')
 last_date = results["date"].values[-1]
 
 final = {}
+
+class Champion:
+    """Hold info about champions."""
+    def __init__(self, champion_id, champion_name, competition, date):
+        self.champion_id = champion_id
+        self.champion_name = champion_name
+        self.competition = competition
+        self.date = date
+
+    def __lt__(self, other):
+        return self.date < other.date
+
+    def __eq__(self, other):
+        return self.champion_id == other.champion_id and self.competition == other.competition
+
+    def __str__(self):
+        return self.champion_name + " - " + self.competition
+
+class Champions_Holder:
+
+    def __init__(self):
+        self.champions = []
+
+    def add_champion(self, champion):
+        i = bisect.bisect_left(self.champions, champion)
+        if i < len(self.champions) and self.champions[i] == champion:
+            print("Duplicate")
+        else:
+            self.champions.insert(i, champion)
 
 def get_competition_date(competition):
     year, month, day = competitions[competitions["id"] == competition][["year", "month", "day"]].values[0]
@@ -57,7 +88,6 @@ def get_regional_champion(competition, region, event, blacklist = []):
     winning_pos = df[df["roundTypeId"] == final_round]["pos"].values[-1] # Helps in ties.
 
     winners_list = df[(df["pos"] == winning_pos) & (df["roundTypeId"] == final_round)][["personId", "personName"]].values
-    print(winners_list)
     return winners_list
 
 def iso_2_id(region_iso):
@@ -104,7 +134,8 @@ def walk_path(region_iso, event, start_date = None, region = None, championship 
         winners = get_regional_champion(championship, region, event)
         for winner in winners:
             champion_id, champion = winner
-            final[region_iso][event].append([champion, champion_id, championship, "New"])
+            final[region_iso][event].add_champion(Champion(champion_id, champion, championship, start_date))
+
             walk_path(region_iso, event, start_date, region, championship, champion, champion_id)
             return
     else:
@@ -128,7 +159,8 @@ def walk_path(region_iso, event, start_date = None, region = None, championship 
                                 return
                             return
                         else:
-                            final[region_iso][event].append([champion, champion_id, championship, "Inactive"])
+                            this = Champion(champion_id, champion, championship, prev_date)
+                            final[region_iso][event].add_champion(this)
                             walk_path(region_iso, event, prev_date, region, championship, champion, champion_id)
 #                            return
             return
@@ -136,7 +168,7 @@ def walk_path(region_iso, event, start_date = None, region = None, championship 
         for winners in winners_list:
             regional_winner_id, regional_winner = winners
             if regional_winner_id != champion_id:
-                final[region_iso][event].append([regional_winner, regional_winner_id, next_competition, "New"])
+                final[region_iso][event].add_champion(Champion(regional_winner_id, regional_winner, next_competition, prev_date))
                 champion_id = regional_winner_id
                 champion = regional_winner
             walk_path(region_iso, event, start_date, region, championship, champion, champion_id)
@@ -153,13 +185,12 @@ def unofficial_official():
     for event in sorted(list(get_set_wca_events())):
         event = "333fm"
 
-        final[region_iso][event] = []
-
+        final[region_iso][event] = Champions_Holder()
         walk_path(region_iso, event)
 
         print(region_iso, final[region_iso]["region"])
         print(event)
-        for x in final[region_iso][event]:
+        for x in final[region_iso][event].champions:
             print(x)
         break
 
