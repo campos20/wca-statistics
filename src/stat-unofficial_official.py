@@ -114,25 +114,7 @@ def get_previous_competitions(person_id, date, event):
             out.append(competition)
     return out
 
-def look_back(person_id, date, event, region):
-    competitions = get_previous_competitions(person_id, date, event)
-    blacklist = [person_id]
-    for competition in competitions[::-1]:
-        winners = get_regional_champion(competition, region, event, blacklist)
-        if len(winners) > 0:
-            for champion_id, winner in winners:
-                next_competition, next_date = get_next_competition_with_date(champion_id, date, event)
-            if next_competition == None: # In this case, the next champion also has gone idle.
-                blacklist.append(champion_id)
-            else:
-                return winners
-    return []
-
-def walk_path(region_iso, event, date = None, region = None, competition = None, champion_id = None, champion = None, blacklist = []):
-
-    if region == None:
-        region = iso_2_id(region_iso)
-        final[region_iso]["region"] = region
+def walk_path(region_iso, region, event, date = None, competition = None, champion_id = None, champion = None, blacklist = []):
 
     if competition == None:
         competition, date = get_next_championship_with_date(region_iso, event, date)
@@ -145,7 +127,7 @@ def walk_path(region_iso, event, date = None, region = None, competition = None,
         winner_id, winner_name = winner
         if winner_id != champion_id:
             new_champion = Champion(winner_id, winner_name, competition, date)
-            status = final[region_iso][event].add_champion(new_champion) # Add and return status
+            status = final[region][event].add_champion(new_champion) # Add and return status
             if not status:
                 return # In this case, this path has already been checked.
         champion_id, champion = winner_id, winner
@@ -162,7 +144,7 @@ def walk_path(region_iso, event, date = None, region = None, competition = None,
             competition = prev_competition
             date = prev_date
 
-        walk_path(region_iso, event, date, region, competition, champion_id, champion, blacklist)
+        walk_path(region_iso, region, event, date, competition, champion_id, champion, blacklist)
 
 def get_all_regions_with_nats():
     isos = championships[championships["championship_type"].str.len() == 2]["championship_type"].values
@@ -174,20 +156,20 @@ def unofficial_official():
     for region_iso in get_all_regions_with_nats():
 
         region_iso = "US"
-        final[region_iso] = {}
+        region = iso_2_id(region_iso)
+        final[region] = {}
 
         for event in sorted(list(get_set_wca_events())):
-            event = "333"
         
-            final[region_iso][event] = Champions_Holder()
-            walk_path(region_iso, event)
+            final[region][event] = Champions_Holder()
+            walk_path(region_iso, region, event)
 
-            break
         break
 
     # It looks like pd.Timestamp is not serializable.
     # That's why we use that if.
     out = "var data = "+json.dumps(final, default = lambda x: str(x) if isinstance(x, pd.Timestamp) else x.__dict__, indent = 2)
+    out += ";"
     create_out_data(out)
     create_page()
 
