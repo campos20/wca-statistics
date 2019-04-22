@@ -2,6 +2,9 @@ import bisect, json, datetime, sys
 import pandas as pd
 from utils import get_set_wca_events
 
+# All the printing progress are here to please travis (so it doesn't stop computation).
+# I could set a wait, but it's cooler to see some progress.
+
 championships = pd.read_csv("WCA_export/WCA_export_championships.tsv", sep="\t")
 competitions = pd.read_csv("WCA_export/WCA_export_Competitions.tsv", sep="\t")
 countries = pd.read_csv("WCA_export/WCA_export_Countries.tsv", sep="\t")
@@ -48,6 +51,9 @@ class Champions_Holder():
         else:
             self.champions.insert(i, champion)
             return True
+
+    def __len__(self):
+        return len(self.champions)
 
 def get_competition_date(competition):
     year, month, day = competitions[competitions["id"] == competition][["year", "month", "day"]].values[0]
@@ -160,21 +166,30 @@ def unofficial_official():
         final[region] = {}
 
         for event in sorted(list(get_set_wca_events())):
-            print(event)
-        
+            print(event, end = " ")
             final[region][event] = Champions_Holder()
             walk_path(region_iso, region, event)
-            print()
 
+        # Remove events with no champion
+        for event in dict(final[region]): # Iterate over a copy
+            if len(final[region][event]) == 0:
+                del final[region][event]
+
+        # Remove countries with no events
+        for region in dict(final):
+            if len(final[region]) == 0:
+                del final[region]
         print()
-
 
     # It looks like pd.Timestamp is not serializable.
     # That's why we use that if.
-    out = "var data = "+json.dumps(final, default = lambda x: str(x) if isinstance(x, pd.Timestamp) else x.__dict__, indent = 2)
+    out = "var data = " + pretty_str(final)
     out += ";"
     create_out_data(out)
     create_page()
+
+def pretty_str(obj):
+    return json.dumps(obj, default = lambda x: str(x) if isinstance(x, pd.Timestamp) else x.__dict__, indent = 2)
 
 def create_out_data(out):
     with open("pages/unofficial_official_data.js", "w", encoding="utf8") as fout:
@@ -193,7 +208,7 @@ def create_page():
     with open("pages/unofficial_official.js", "w", encoding="utf8") as fout:
         fout.write(script)
 
-    title = "Unofficial official champion"
+    title = "" # Title is actually created inside the .js
     explanation = ""
 
     header = open("template/header.html", "r", encoding="utf8").read()%title
@@ -201,12 +216,22 @@ def create_page():
     footer = open("template/footer.html", "r", encoding="utf8").read()%file_name
     closing = open("template/closing.html", "r", encoding="utf8").read()
 
-    content = '<script src="unofficial_official_data.js"></script>\n'
-    content += '<script src="unofficial_official.js"></script>'
+
+    content = '<div id="content">\n</div>'
+    content += '<script src="unofficial_official_data.js"></script>\n'
+    content += '<script src="unofficial_official.js" type="module"></script>'
 
     page = open("template/stat.html", "r", encoding="utf8").read()%(header, nav_bar, title, explanation, content, footer, closing)
     with open("pages/%s"%file_name, "w", encoding="utf8") as fout:
         fout.write(page)
+
+    # move js files
+    js = open("src/unofficial_official.js", "r", encoding="utf8").read()
+    with open("pages/unofficial_official.js", "w", encoding="utf8") as fout:
+        fout.write(js)
+    js = open("src/useQueryParameter.js", "r", encoding="utf8").read()
+    with open("pages/useQueryParameter.js", "w", encoding="utf8") as fout:
+        fout.write(js)
 
 def main():
     unofficial_official()
