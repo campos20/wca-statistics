@@ -1,4 +1,4 @@
-import bisect
+import bisect, json, datetime, sys
 import pandas as pd
 from utils import get_set_wca_events
 
@@ -11,9 +11,7 @@ results = results.drop(columns=["value1", "value2", "value3", "value4", "value5"
 results["date"] = results['date'].astype('datetime64[ns]')
 last_date = results["date"].values[-1]
 
-final = {}
-
-class Champion:
+class Champion():
     """Hold info about champions."""
     def __init__(self, champion_id, champion_name, competition, date):
         self.champion_id = champion_id
@@ -22,25 +20,34 @@ class Champion:
         self.date = date
 
     def __lt__(self, other):
-        return self.date < other.date
+        if self.date == other.date:
+            return self.champion_name < other.champion_name
+        else:
+            return self.date < other.date
 
     def __eq__(self, other):
         return self.champion_id == other.champion_id and self.competition == other.competition
 
     def __str__(self):
-        return self.champion_name + " - " + self.competition
+        return str([self.champion_id, self.champion_name, self.competition])
 
-class Champions_Holder:
+class Champions_Holder():
 
     def __init__(self):
         self.champions = []
 
+    def __str__(self):
+        return str(self.champions)
+    
+    # This function also returns a status.
+    # True means that this path has already been checked, no need to proceed.
     def add_champion(self, champion):
         i = bisect.bisect_left(self.champions, champion)
         if i < len(self.champions) and self.champions[i] == champion:
-            print("Duplicate")
+            return False
         else:
             self.champions.insert(i, champion)
+            return True
 
 def get_competition_date(competition):
     year, month, day = competitions[competitions["id"] == competition][["year", "month", "day"]].values[0]
@@ -77,7 +84,7 @@ def get_next_championship_with_date(region, event, start_date = None):
     return championship, dt
 
 def get_regional_champion(competition, region, event, blacklist = []):
-    df = results[(results["competitionId"] == competition) & (results["eventId"] == event) & (results["personCountryId"] == region) & (~results["personId"].isin(blacklist))]
+    df = results[(results["competitionId"] == competition) & (results["eventId"] == event) & (results["personCountryId"] == region) & (results["best"] > 0) & (~results["personId"].isin(blacklist))]
     if df.empty:
         return []
 
@@ -121,78 +128,100 @@ def look_back(person_id, date, event, region):
                 return winners
     return []
 
-def walk_path(region_iso, event, start_date = None, region = None, championship = None, champion = None, champion_id = None):
+def walk_path(region_iso, event, date = None, region = None, competition = None, champion_id = None, champion = None, blacklist = []):
 
     if region == None:
         region = iso_2_id(region_iso)
         final[region_iso]["region"] = region
 
-    if championship == None:
-        championship, start_date = get_next_championship_with_date(region_iso, event, start_date)
+    if competition == None:
+        competition, date = get_next_championship_with_date(region_iso, event, date)
+        if competition == None:
+            return
     
-    if champion_id == None: # TODO join this within the else
-        winners = get_regional_champion(championship, region, event)
-        for winner in winners:
-            champion_id, champion = winner
-            final[region_iso][event].add_champion(Champion(champion_id, champion, championship, start_date))
+    winners = get_regional_champion(competition, region, event, blacklist)
+    for winner in winners:
 
-            walk_path(region_iso, event, start_date, region, championship, champion, champion_id)
-            return
-    else:
-        prev_date = start_date
-        next_competition, start_date = get_next_competition_with_date(champion_id, start_date, event)
-        if next_competition == None:
-            if prev_date + pd.DateOffset(years = 1) <= last_date:
-                # Competitor did not compete for 1 year
-                winners = look_back(champion_id, prev_date, event, region)
-                if len(winners) > 0:
-                    for winner in winners:
-                        champion_id, champion = winner
-                        if champion_id == None:
-                            championship, start_date = get_next_championship_with_date(region_iso, event, start_date)
-                            if championship == None:
-                                print("Terminating")
-                                return
-                            else:
-                                print("Fresh new start")
-                                # Fresh new start logic goes here
-                                return
-                            return
-                        else:
-                            this = Champion(champion_id, champion, championship, prev_date)
-                            final[region_iso][event].add_champion(this)
-                            walk_path(region_iso, event, prev_date, region, championship, champion, champion_id)
-#                            return
-            return
-        winners_list = get_regional_champion(next_competition, region, event)
-        for winners in winners_list:
-            regional_winner_id, regional_winner = winners
-            if regional_winner_id != champion_id:
-                final[region_iso][event].add_champion(Champion(regional_winner_id, regional_winner, next_competition, prev_date))
-                champion_id = regional_winner_id
-                champion = regional_winner
-            walk_path(region_iso, event, start_date, region, championship, champion, champion_id)
-            return
+        winner_id, winner_name = winner
+        if winner_id != champion_id:
+            new_champion = Champion(winner_id, winner_name, competition, date)
+            status = final[region_iso][event].add_champion(new_champion) # Add and return status
+            if not status:
+                return # In this case, this path has already been checked.
+        champion_id, champion = winner_id, winner
+        
+        prev_competition = competition
+        prev_date = date
+        
+        competition, date = get_next_competition_with_date(champion_id, date, event)
+        
+        if competition == None:
+            if prev_date + pd.DateOffset(years = 1) > last_date:
+                return
+            blacklist.append(champion_id)
+            competition = prev_competition
+            date = prev_date
 
-        championship = next_competition        
-    walk_path(region_iso, event, start_date, region, championship, champion, champion_id)
+        walk_path(region_iso, event, date, region, competition, champion_id, champion, blacklist)
 
+def get_all_regions_with_nats():
+    isos = championships[championships["championship_type"].str.len() == 2]["championship_type"].values
+    return sorted(list(set(isos)))
+
+final = {}
 def unofficial_official():
 
-    region_iso = "BR"
-    final[region_iso] = {}
+    for region_iso in get_all_regions_with_nats():
 
-    for event in sorted(list(get_set_wca_events())):
-        event = "333fm"
+        region_iso = "US"
+        final[region_iso] = {}
 
-        final[region_iso][event] = Champions_Holder()
-        walk_path(region_iso, event)
+        for event in sorted(list(get_set_wca_events())):
+            event = "333"
+        
+            final[region_iso][event] = Champions_Holder()
+            walk_path(region_iso, event)
 
-        print(region_iso, final[region_iso]["region"])
-        print(event)
-        for x in final[region_iso][event].champions:
-            print(x)
+            break
         break
+
+    # It looks like pd.Timestamp is not serializable.
+    # That's why we use that if.
+    out = "var data = "+json.dumps(final, default = lambda x: str(x) if isinstance(x, pd.Timestamp) else x.__dict__, indent = 2)
+    create_out_data(out)
+    create_page()
+
+def create_out_data(out):
+    with open("pages/unofficial_official_data.js", "w", encoding="utf8") as fout:
+        fout.write(out)
+
+def create_page():
+
+    file_name = "stat-unofficial_official.html"
+    for x in sys.argv: # Double check
+        x = x.split("/")[-1].split(".")[0]
+        file_name = x+".html"
+
+    # This part copies script from src to pages.
+    # Pages gets flushed, so this copy is helpful.
+    script = open("src/unofficial_official.js", "r", encoding="utf8").read()
+    with open("pages/unofficial_official.js", "w", encoding="utf8") as fout:
+        fout.write(script)
+
+    title = "Unofficial official champion"
+    explanation = ""
+
+    header = open("template/header.html", "r", encoding="utf8").read()%title
+    nav_bar = open("template/nav_bar.html", "r", encoding="utf8").read()
+    footer = open("template/footer.html", "r", encoding="utf8").read()%file_name
+    closing = open("template/closing.html", "r", encoding="utf8").read()
+
+    content = '<script src="unofficial_official_data.js"></script>\n'
+    content += '<script src="unofficial_official.js"></script>'
+
+    page = open("template/stat.html", "r", encoding="utf8").read()%(header, nav_bar, title, explanation, content, footer, closing)
+    with open("pages/%s"%file_name, "w", encoding="utf8") as fout:
+        fout.write(page)
 
 def main():
     unofficial_official()
