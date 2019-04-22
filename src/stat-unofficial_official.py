@@ -155,16 +155,19 @@ def unofficial_official():
 
     for region_iso in get_all_regions_with_nats():
 
-        region_iso = "US"
         region = iso_2_id(region_iso)
+        print(region)
         final[region] = {}
 
         for event in sorted(list(get_set_wca_events())):
+            print(event)
         
             final[region][event] = Champions_Holder()
             walk_path(region_iso, region, event)
+            print()
 
-        break
+        print()
+
 
     # It looks like pd.Timestamp is not serializable.
     # That's why we use that if.
