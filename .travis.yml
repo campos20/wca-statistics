@@ -13,4 +13,4 @@ install:
   - pip install numpy
   - pip3 install pandas
 script:
-  - ./run.sh
+  - travis_wait 60 ./run.sh
