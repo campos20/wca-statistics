@@ -57,6 +57,7 @@ else
     if [ ! -f "$ordered_file" ] || [ "$order" = true ]; then
         echo "Sorting results..."
         python3 src/create_sorted_tsv_with_date.py
+        python3 src/python3 src/cut_to_year.py 2015 # shrink data on this branch
     fi
     
     # delete possible existing pages
