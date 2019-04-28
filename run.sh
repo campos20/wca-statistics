@@ -33,8 +33,8 @@ fi
 
 if [ "$download" = true ]; then
     echo "Downloading the latest export."
-    wget https://www.worldcubeassociation.org/results/misc/WCA_export.tsv.zip
-    wget https://www.worldcubeassociation.org/wst/wca-developer-database-dump.zip
+    wget -q https://www.worldcubeassociation.org/results/misc/WCA_export.tsv.zip
+    wget -q https://www.worldcubeassociation.org/wst/wca-developer-database-dump.zip
 fi
 
 if [ ! -f $export_file ]; then
