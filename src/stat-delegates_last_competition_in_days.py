@@ -7,6 +7,12 @@ import re
 import sys
 
 
+def iso2_country_name(countryId):
+    country_list = pd.read_csv("WCA_export/WCA_export_Countries.tsv", sep='\t')
+    countryId = countryId.strip()
+    return country_list[country_list["iso2"] == countryId]["name"].values[-1]
+
+
 def extract_delegate(line):
     out = []
     for x in re.findall("\[(.*?)\]", line):
@@ -70,7 +76,7 @@ def main():
             p = "-"
         if days != float("inf"):
             table.append([p, days, html_link_format(
-                name, get_competitor_link(wca_id)), country, get_competition_html_link(competition)])
+                name, get_competitor_link(wca_id)), iso2_country_name(country), get_competition_html_link(competition)])
             pos += 1
 
     out["table"] = table
