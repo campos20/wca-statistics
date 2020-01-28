@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 from math import *
+import re
 
 # WCA_export_Competitions labels
 """id name cityName countryId information [0-4]
@@ -191,3 +192,19 @@ def iso2_country_name(countryId):
     country_list = pd.read_csv("WCA_export/WCA_export_Countries.tsv", sep='\t')
     countryId = countryId.strip()
     return country_list[country_list["iso2"] == countryId]["name"].values[-1]
+
+
+def extract_delegate(line):
+    """Delegates are written on a strange way on the export.
+    This function extracts all of them.
+    Example:
+    [{Marlon de V. Marques}{mailto:mmarques@worldcubeassociation.org}] [{Murillo Gomes Otero}{mailto:motero@worldcubeassociation.org}] [{Pedro Santos Guimarães}{mailto:pguimaraes@worldcubeassociation.org}]"""
+    out = []
+    for x in re.findall("\[(.*?)\]", line):
+        delegate = re.findall("\{(.*?)\}", x)
+        delegate_name = delegate[0]
+        out.append(delegate_name)
+    return out
+
+
+# print(dist(-16717151, -49254835, -15650789, -47806808))
