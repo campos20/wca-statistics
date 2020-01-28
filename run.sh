@@ -20,10 +20,6 @@ if [ -f $export_file ]; then
         if [ -d "$export_folder" ]; then
             rm -rR "$export_folder"
         fi
-
-        # remove developer export and the database
-        rm wca-developer-database-dump*
-        sudo mysql -e "DROP DATABASE IF EXISTS WCA;"
     else
         echo "$export_file is up to date."
     fi
@@ -34,7 +30,6 @@ fi
 if [ "$download" = true ]; then
     echo "Downloading the latest export."
     wget -q https://www.worldcubeassociation.org/results/misc/WCA_export.tsv.zip
-    wget -q https://www.worldcubeassociation.org/wst/wca-developer-database-dump.zip
 fi
 
 if [ ! -f $export_file ]; then
@@ -47,10 +42,6 @@ else
         echo "Extracting $export_file"
         unzip "$export_file" -d "$export_folder"
 
-        # create a new database and its outputs
-        unzip wca-developer-database-dump.zip
-        sh ./generate-output-from-database.sh
-        
         order=true;
     fi
     
