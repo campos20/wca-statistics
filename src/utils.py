@@ -207,4 +207,7 @@ def extract_delegate(line):
     return out
 
 
-# print(dist(-16717151, -49254835, -15650789, -47806808))
+def get_delegates_list():
+    with open('temp/delegates.json') as delegates_json:
+        return json.load(delegates_json)
+    raise "Error loading delegates json"

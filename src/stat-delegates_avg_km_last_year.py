@@ -2,36 +2,28 @@ from datetime import datetime, date
 from bisect import bisect_left
 from build_page import build_results
 from utils import *
-from Model import Competition
+from Model import Competition, Competitor
 import pandas as pd
 import re
 import sys
 
 
 def main():
-    delegates_id = []
-    delegates_name = []
-    delegates_country = []
-    delegates_competition_list = []
-    delegates_distance_avg = []
-    delegates_competition_count = []
-    with open("database_out/delegates_list.txt") as f:
-        for x in f:
-            wca_id, name, region = x.split("\t")
+    delegates_list = get_delegates_list()
+    delegates = list(map(delegate_json_2_delegate, delegates_list))
 
-            i = bisect_left(delegates_name, name)
+    # Sort delegates by name
+    delegates.sort(key=lambda x: x.name)
 
-            delegates_id.insert(i, wca_id)
-            delegates_name.insert(i, name)
-            delegates_country.insert(i, region)
-            delegates_competition_list.insert(i, [])
+    # Ordered list of delegates names for binary search
+    delegates_ordered_names = list(map(lambda x: x.name, delegates))
 
     today = date.today()
 
     competitions = pd.read_csv(
         "WCA_export/WCA_export_Competitions.tsv", sep="\t")
     for _, row in competitions.iterrows():
-        id, year, month, day, delegates, latitude, longitude, city, country = row[[
+        id, year, month, day, delegates_string, latitude, longitude, city, country = row[[
             "id", "year", "month", "day", "wcaDelegate", "latitude", "longitude", "cityName", "countryId"]]
 
         competition_date = date(year, month, day)
@@ -50,34 +42,35 @@ def main():
         competition.location = (latitude, longitude)
         competition.date = competition_date
 
-        delegates = extract_delegate(delegates)
+        competition_delegates = extract_delegate(delegates_string)
 
-        for delegate in delegates:
-            index = bisect_left(delegates_name, delegate)
+        for delegate in competition_delegates:
+            index = bisect_left(delegates_ordered_names, delegate)
             # competition's delegate is no longer a delegate
-            if index == len(delegates_name) or delegates_name[index] != delegate:
+            if index == len(delegates_ordered_names) or delegates_ordered_names[index] != delegate:
                 continue
-            delegates_competition_list[index].append(competition)
+            delegates[index].competition_list.append(competition)
 
-    for i in range(len(delegates_name)):
-        for j in range(len(delegates_competition_list[i])):
-            delegates_competition_list[i] = sorted(
-                delegates_competition_list[i])
+    for delegate in delegates:
+
+        # Sort competitions by date
+        delegate.competition_list.sort()
 
         total_distance = 0
-        for j in range(1, len(delegates_competition_list[i])):
-            # if delegates_competition_list[i][j].date < delegates_competition_list[i][j-1].date:
-            #    raise "Not sorted"
+        for j in range(1, len(delegate.competition_list)):
+            if delegate.competition_list[j].date < delegate.competition_list[j-1].date:
+                raise "Not sorted"
 
-            distance = delegates_competition_list[i][j].distance(
-                delegates_competition_list[i][j-1])
+            distance = delegate.competition_list[j].distance(
+                delegate.competition_list[j-1])
             total_distance += distance
-        number_of_competitions = len(delegates_competition_list[i])
+        number_of_competitions = len(delegate.competition_list)
 
         # avoid / 0
-        delegates_distance_avg.append(1.0 *
-                                      total_distance / max(1, number_of_competitions-1))
-        delegates_competition_count.append(number_of_competitions)
+        delegate.avg = total_distance / max(1, number_of_competitions-1)
+
+    # Sort delegates by distance
+    delegates.sort(key=lambda x: x.avg)
 
     out = {}
     out["title"] = "Average distance by delegates in the past 365 days"
@@ -88,13 +81,13 @@ def main():
 
     prev = None
     pos = 1
-    for avg, wca_id, name, country, count in sorted(zip(delegates_distance_avg, delegates_id, delegates_name, delegates_country, delegates_competition_count))[::-1]:
+    for delegate in delegates[::-1]:
         p = pos
-        result = "%.2f" % avg
+        result = "%.2f" % delegate.avg
         if result == prev:
             p = "-"
         table.append([p, result, html_link_format(
-            name, get_competitor_link(wca_id)), iso2_country_name(country), count])
+            delegate.name, delegate.url), delegate.country, len(delegate.competition_list)])
         pos += 1
         prev = result
 
@@ -102,6 +95,26 @@ def main():
     out["explanation"] = "The Avg column is the average distance a delegate traveled from one competition to the next."
 
     build_results(out, sys.argv)
+
+
+def delegate_json_2_delegate(delegate_json):
+    wca_id = delegate_json["wca_id"]
+    name = delegate_json["name"]
+    country_id = delegate_json["country_iso2"]
+    url = delegate_json["url"]
+
+    delegate = Competitor()
+
+    delegate.wca_id = wca_id
+    delegate.name = name
+    delegate.country = iso2_country_name(country_id)
+    delegate.url = url
+    delegate.competition_list = []
+
+    # Custom attribute
+    delegate.avg = None
+
+    return delegate
 
 
 if __name__ == "__main__":
