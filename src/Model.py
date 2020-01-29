@@ -18,3 +18,17 @@ class Competition:
     # Sorting competitions by date
     def __lt__(self, other):
         return self.date < other.date
+
+
+class Competitor:
+    wca_id = None
+    name = None
+    country = None
+    url = None
+    competition_list = None
+
+    def __lt__(self, other):
+        return self.wca_id < other.wca_id
+
+    def __eq__(self, other):
+        return self.wca_id == other.wca_id

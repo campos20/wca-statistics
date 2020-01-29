@@ -61,6 +61,9 @@ else
     
     cp img/favicon.ico pages/favicon.ico
     cp img/cover.png pages/cover.png
+
+    echo "Running setup"
+    python3 setup.py
     
     echo "Computing statistics..."
     for f in $(ls src |grep stat*); do

@@ -10,10 +10,21 @@ delegates_endpoint = "/delegates"
 
 
 def get_delegates():
-    url = base_url + delegates_endpoint
-    print("Fetching data from WCA")
-    print("url:", url)
 
-    with urllib.request.urlopen(url) as request:
-        data = json.loads(request.read().decode())
-        return data
+    print("Fetching data from WCA")
+
+    page = 1
+
+    delegates = []
+    while True:
+        # json is paginated
+        url = base_url + delegates_endpoint+"?page=%s" % page
+        print("url:", url)
+
+        with urllib.request.urlopen(url) as request:
+            data = json.loads(request.read().decode())
+            if len(data) == 0:
+                break
+            delegates += data
+        page += 1
+    return delegates
