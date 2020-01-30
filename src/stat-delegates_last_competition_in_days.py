@@ -1,33 +1,40 @@
-from datetime import datetime, date
+import datetime
 from bisect import bisect_left
 from build_page import build_results
 from utils import *
 import pandas as pd
 import sys
+from utils import get_delegates_list, iso2_country_name
 
 
 def main():
+    print("Getting delegate list")
+    delegates_list = get_delegates_list()
+
     delegates_id = []
     delegates_name = []
     delegates_country = []
     delegates_last_competition_date = []
     delegates_last_competition_name = []
     day_diff = []
-    with open("database_out/delegates_list.txt") as f:
-        for x in f:
-            wca_id, name, region = x.split("\t")
 
-            i = bisect_left(delegates_name, name)
+    for delegate in delegates_list:
+        wca_id = delegate["wca_id"]
+        name = delegate["name"]
 
-            delegates_id.insert(i, wca_id)
-            delegates_name.insert(i, name)
-            delegates_country.insert(i, region)
-            # Who cares with the position of None
-            delegates_last_competition_date.append(None)
-            delegates_last_competition_name.append(None)
-            day_diff.append(float("inf"))
+        country_id = delegate["country_iso2"]
 
-    today = datetime.today()
+        i = bisect_left(delegates_name, name)
+
+        delegates_id.insert(i, wca_id)
+        delegates_name.insert(i, name)
+        delegates_country.insert(i, country_id)
+        # Who cares with the position of None
+        delegates_last_competition_date.append(None)
+        delegates_last_competition_name.append(None)
+        day_diff.append(float("inf"))
+
+    today = datetime.date.today()
 
     competitions = pd.read_csv(
         "WCA_export/WCA_export_Competitions.tsv", sep="\t")
@@ -35,22 +42,27 @@ def main():
         competition, year, month, day, delegates = row[[
             "id", "year", "month", "day", "wcaDelegate"]]
 
-        current_date = datetime(year, month, day)
+        competition_date = datetime.date(year, month, day)
+
+        if competition_date > today:
+            continue
+
         delegates = extract_delegate(delegates)
 
         for delegate in delegates:
             i = bisect_left(delegates_name, delegate)
             if i < len(delegates_name) and delegates_name[i] == delegate:
-                if current_date <= today and (delegates_last_competition_date[i] == None or current_date > delegates_last_competition_date[i]):
-                    delegates_last_competition_date[i] = current_date
+                if delegates_last_competition_date[i] == None or competition_date > delegates_last_competition_date[i]:
+                    delegates_last_competition_date[i] = competition_date
                     delegates_last_competition_name[i] = competition
-                    day_diff[i] = (today-current_date).days
+                    day_diff[i] = (today-competition_date).days
 
-        out = {}
-        out["title"] = "Last delegated competition in days"
-        out["labels"] = ["#", "Days", "Delegate", "Country", "Last competition"]
+    out = {}
+    out["title"] = "Last delegated competition in days"
+    out["labels"] = ["#", "Days", "Delegate",
+                     "Country", "Continent", "Last competition"]
 
-        table = []
+    table = []
 
     prev = None
     pos = 1
@@ -60,8 +72,9 @@ def main():
             p = "-"
         if days != float("inf"):
             table.append([p, days, html_link_format(
-                name, get_competitor_link(wca_id)), iso2_country_name(country), get_competition_html_link(competition)])
+                name, get_competitor_link(wca_id)), iso2_country_name(country), find_continent(iso2_country_name(country)), get_competition_html_link(competition)])
             pos += 1
+        prev = days
 
     out["table"] = table
 
