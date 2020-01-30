@@ -170,6 +170,9 @@ def dist(lat1, lon1, lat2, lon2):
 
 
 def find_continent(countryId):
+    if countryId == "United States":
+        return "North America"
+
     data = pd.read_csv("WCA_export/WCA_export_Countries.tsv", sep="\t")
     continentId = data[data["id"] == countryId]["continentId"].to_string(
         index=False).strip()
