@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- header-->
+  <head>
+    
+    <!--Load the AJAX API-->
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="tempCompetitorData.js"></script>
+  <title>Number of new competitors in each year by region</title>
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+  </head>
+
+  <body>
+    <!-- nav bar-->
+    <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-light">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse navbar-inverse" id="collapsibleNavbar">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="index.html">Home</a>
+      </li>
+<!--      <li class="nav-item">
+        <a class="nav-link" href="findme.html">Find me</a>
+      </li>-->
+      <li class="nav-item">
+        <a class="nav-link" href="about.html">About</a>
+      </li>
+    </ul>
+  </div>  
+</nav>
+
+
+
+    <div class="container">
+      <!-- title-->
+      <h1 style="text-align:center">Number of new competitors in each year by region</h1>
+
+
+      <!-- explanation, if needed-->
+      
+
+      <!-- content-->
+      
+    <div style="text-align: center">    
+     <select id="selector">
+      <optgroup>       <option>World</option>
+      </optgroup>      <optgroup>       <option>Africa</option>
+       <option>Asia</option>
+       <option>Europe</option>
+       <option>North America</option>
+       <option>Oceania</option>
+       <option>South America</option>
+      </optgroup>      <optgroup>       <option>Afghanistan</option>
+       <option>Albania</option>
+       <option>Algeria</option>
+       <option>Andorra</option>
+       <option>Angola</option>
+       <option>Argentina</option>
+       <option>Armenia</option>
+       <option>Australia</option>
+       <option>Austria</option>
+       <option>Azerbaijan</option>
+       <option>Bahamas</option>
+       <option>Bahrain</option>
+       <option>Bangladesh</option>
+       <option>Belarus</option>
+       <option>Belgium</option>
+       <option>Belize</option>
+       <option>Bhutan</option>
+       <option>Bolivia</option>
+       <option>Bosnia and Herzegovina</option>
+       <option>Brazil</option>
+       <option>Brunei</option>
+       <option>Bulgaria</option>
+       <option>Cambodia</option>
+       <option>Canada</option>
+       <option>Chile</option>
+       <option>China</option>
+       <option>Colombia</option>
+       <option>Costa Rica</option>
+       <option>Cote d_Ivoire</option>
+       <option>Croatia</option>
+       <option>Cuba</option>
+       <option>Cyprus</option>
+       <option>Czech Republic</option>
+       <option>Democratic Republic of the Congo</option>
+       <option>Denmark</option>
+       <option>Dominican Republic</option>
+       <option>Ecuador</option>
+       <option>Egypt</option>
+       <option>El Salvador</option>
+       <option>Estonia</option>
+       <option>Finland</option>
+       <option>France</option>
+       <option>Georgia</option>
+       <option>Germany</option>
+       <option>Ghana</option>
+       <option>Greece</option>
+       <option>Grenada</option>
+       <option>Guatemala</option>
+       <option>Guyana</option>
+       <option>Haiti</option>
+       <option>Honduras</option>
+       <option>Hong Kong</option>
+       <option>Hungary</option>
+       <option>Iceland</option>
+       <option>India</option>
+       <option>Indonesia</option>
+       <option>Iran</option>
+       <option>Iraq</option>
+       <option>Ireland</option>
+       <option>Israel</option>
+       <option>Italy</option>
+       <option>Jamaica</option>
+       <option>Japan</option>
+       <option>Jordan</option>
+       <option>Kazakhstan</option>
+       <option>Kenya</option>
+       <option>Korea</option>
+       <option>Kosovo</option>
+       <option>Kuwait</option>
+       <option>Kyrgyzstan</option>
+       <option>Latvia</option>
+       <option>Lebanon</option>
+       <option>Libya</option>
+       <option>Liechtenstein</option>
+       <option>Lithuania</option>
+       <option>Luxembourg</option>
+       <option>Macau</option>
+       <option>Madagascar</option>
+       <option>Malawi</option>
+       <option>Malaysia</option>
+       <option>Malta</option>
+       <option>Mauritius</option>
+       <option>Mexico</option>
+       <option>Moldova</option>
+       <option>Monaco</option>
+       <option>Mongolia</option>
+       <option>Montenegro</option>
+       <option>Morocco</option>
+       <option>Namibia</option>
+       <option>Nepal</option>
+       <option>Netherlands</option>
+       <option>New Zealand</option>
+       <option>Nicaragua</option>
+       <option>Nigeria</option>
+       <option>North Macedonia</option>
+       <option>Norway</option>
+       <option>Oman</option>
+       <option>Pakistan</option>
+       <option>Palestine</option>
+       <option>Panama</option>
+       <option>Papua New Guinea</option>
+       <option>Paraguay</option>
+       <option>Peru</option>
+       <option>Philippines</option>
+       <option>Poland</option>
+       <option>Portugal</option>
+       <option>Romania</option>
+       <option>Russia</option>
+       <option>Saint Kitts and Nevis</option>
+       <option>Samoa</option>
+       <option>Saudi Arabia</option>
+       <option>Senegal</option>
+       <option>Serbia</option>
+       <option>Singapore</option>
+       <option>Slovakia</option>
+       <option>Slovenia</option>
+       <option>Somalia</option>
+       <option>South Africa</option>
+       <option>Spain</option>
+       <option>Sri Lanka</option>
+       <option>Sudan</option>
+       <option>Suriname</option>
+       <option>Sweden</option>
+       <option>Switzerland</option>
+       <option>Syria</option>
+       <option>Taiwan</option>
+       <option>Tajikistan</option>
+       <option>Tanzania</option>
+       <option>Thailand</option>
+       <option>Togo</option>
+       <option>Trinidad and Tobago</option>
+       <option>Tunisia</option>
+       <option>Turkey</option>
+       <option>Turkmenistan</option>
+       <option>USA</option>
+       <option>Uganda</option>
+       <option>Ukraine</option>
+       <option>United Arab Emirates</option>
+       <option>United Kingdom</option>
+       <option>Uruguay</option>
+       <option>Uzbekistan</option>
+       <option>Venezuela</option>
+       <option>Vietnam</option>
+       <option>Zambia</option>
+       <option>Zimbabwe</option>
+      </optgroup>     </select>
+
+     <div id="chart_div"></div>
+    </div>
+    <script src="chart.js"></script>
+
+
+      <!-- footer-->
+      <p>Send suggestions or report bugs to acampos@worldcubeassociation.org</p>
+<p>This site is open source. Check the code <a href="https://github.com/campos20/wca-statistics/blob/master/src/stat-chart-number_of_new_competitors_year.py">here</a>.</p>
+
+    </div>
+
+    <!-- closing -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+  </body>
+</html>
